@@ -91,18 +91,20 @@ class Romino:
             self.deckungsgleich(verschobene_array1,
                                 verschobene_array2, rotation + 1)
 
-    def render(self):
-        bild = PIL.Image.new(
-            "RGB", (len(self.array) * 10, len(self.array) * 10))
-        draw = PIL.ImageDraw.Draw(bild)
-        for x in range(len(self.array)):
-            for y in range(len(self.array)):
-                if self.array[x][y] == 1:
+    def render(self, draw, x, y):
+        draw.rectangle(
+            [(x, y), (x + len(self.array) * 10, y + len(self.array) * 10)],
+            None,
+            (100, 100, 100)
+        )
+        for x2 in range(len(self.array)):
+            for y2 in range(len(self.array)):
+                if self.array[x2][y2] == 1:
                     draw.rectangle(
-                        [(x * 10, y * 10), (x * 10 + 10, y * 10 + 10)],
-                        (255, 255, 255)
+                        [(x2 * 10 + x, y2 * 10 + y), (x2 * 10 + 10 + x, y2 * 10 + 10 + y)],
+                        (0xcf, 0x2b, 0x1d),
+                        (0, 0, 0)
                     )
-        return bild
 
 
 if __name__ == "__main__":
@@ -143,8 +145,21 @@ if __name__ == "__main__":
                 if romino.deckungsgleich(romino2.array):
                     break
             else:
-                romino.render().save("save" + str(len(gültige_rominos)) + ".png")
                 gültige_rominos.append(romino)
 
     # Speichere Rominos ab
-    print(len(gültige_rominos))
+    größe = 1
+    while größe * größe < len(gültige_rominos):
+        größe += 1
+    bild = PIL.Image.new("RGB", ((n + 1) * 10 * größe - 9, (n + 1) * 10 * größe - 9))
+    draw = PIL.ImageDraw.Draw(bild)
+    draw.rectangle((0, 0) + bild.size, (255, 255, 255))
+    x = 0
+    y = 0
+    for romino in gültige_rominos:
+        romino.render(draw, (n + 1) * 10 * x, (n + 1) * 10 * y)
+        x += 1
+        if x >= größe:
+            x = 0
+            y += 1
+    bild.save(sys.argv[2])
