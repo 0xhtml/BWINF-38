@@ -53,43 +53,43 @@ class Romino:
                 return True
         return False
 
-    def deckungsgleich(self, array1, array2=None, rotation=0):
+    def gleich(self, array1, array2, rotation=0, flip=0):
+        size = len(array1)
+        
+        if rotation != 0:
+            array2 = numpy.rot90(array2, rotation)
+        if flip != 0:
+            array2 = numpy.flip(array2, flip - 1)
+
+        min_x1 = size
+        min_y1 = size
+        min_x2 = size
+        min_y2 = size
+        for x in range(size):
+            for y in range(size):
+                if array1[x][y] == 1:
+                    min_x1 = min(x, min_x1)
+                    min_y1 = min(y, min_y1)
+                if array2[x][y] == 1:
+                    min_x2 = min(x, min_x2)
+                    min_y2 = min(y, min_y2)
+        array1 = numpy.roll(numpy.roll(array1, -min_x1, axis=0), -min_y1, axis=1)
+        array2 = numpy.roll(numpy.roll(array2, -min_x2, axis=0), -min_y2, axis=1)
+
+        return (array1 == array2).all()
+
+    def deckungsgleich(self, array):
         """
         Diese Funktion testet ob zwei Rominos durch drehen, spiegeln und
         verschieben deckungsgleich sind.
         """
-        if rotation == 4:
-            return False
-
-        if array2 is None:
-            array2 = self.array
-
-        # Rotiere den zweiten Romino
-        rotierte_array2 = numpy.rot90(array2)
-
-        # Verschiebe Rominos an den Nullpunkt
-        min_x1 = len(array1)
-        min_y1 = len(array1)
-        min_x2 = len(array1)
-        min_y2 = len(array1)
-        for x in range(len(array1)):
-            for y in range(len(array1)):
-                if array1[x][y] == 1:
-                    min_x1 = min(x, min_x1)
-                    min_y1 = min(y, min_y1)
-                if rotierte_array2[x][y] == 1:
-                    min_x2 = min(x, min_x2)
-                    min_y2 = min(y, min_y2)
-        verschobene_array1 = numpy.roll(numpy.roll(
-            array1, -min_x1, axis=0), -min_y1, axis=1)
-        verschobene_array2 = numpy.roll(numpy.roll(
-            rotierte_array2, -min_x2, axis=0), -min_y2, axis=1)
-
-        return (verschobene_array1 == verschobene_array2).all() or \
-            (verschobene_array1 == numpy.flip(verschobene_array2, 0)).all() or \
-            (verschobene_array1 == numpy.flip(verschobene_array2, 1)).all() or \
-            self.deckungsgleich(verschobene_array1,
-                                verschobene_array2, rotation + 1)
+        rotationen = (0, 1, 2, 3)
+        flips = (0, 1, 2)
+        for rotation in rotationen:
+            for flip in flips:
+                if self.gleich(self.array, array, rotation, flip):
+                    return True
+        return False
 
     def render(self, draw, x, y):
         draw.rectangle(
@@ -162,4 +162,5 @@ if __name__ == "__main__":
         if x >= größe:
             x = 0
             y += 1
+    draw.text((1, bild.height-10), str(len(gültige_rominos)), (0, 0, 0))
     bild.save(sys.argv[2])
