@@ -17,64 +17,41 @@ class Romino:
 
     def gültig(self):
         """
-        Diese Funktion testet, ob es sich um eine gültige Kombinatzion von
+        Diese Funktion testet, ob es sich um eine gültige Kombination von
         Quadraten handelt.
 
         Für eine gültige Kombination müssen sich mindestens einmal zwei Quadrate
         nur mit der Ecke (also diagonal) berühren.
         """
-        diagonalen = False
-        # Gehe durch alle Positionen
-        for i in range(len(self.array)):
-            for j in range(len(self.array)):
-                # Überspringe Positionen, auf denen kein Quadrat ist
-                if self.array[i][j] == 0:
-                    continue
+        # Teste ob alle Quadrate mit einander verbunden sind
+        gefunden = []
+        for x in range(len(self.array)):
+            for y in range(len(self.array)):
+                if self.array[x][y] == 1:
+                    if (x+1, y+1) in gefunden or \
+                            (x+1, y) in gefunden or \
+                            (x+1, y-1) in gefunden or \
+                            (x, y+1) in gefunden or \
+                            (x, y-1) in gefunden or \
+                            (x-1, y+1) in gefunden or \
+                            (x-1, y) in gefunden or \
+                            (x-1, y-1) in gefunden or \
+                            len(gefunden) == 0:
+                        gefunden.append((x, y))
+                    else:
+                        return False
 
-                # Teste ob das Quadrat die anderen Quadrate berührt
-                berührt = False
-                for xo in [-1, 1]:
-                    for yo in [-1, 1]:
-                        try:
-                            if self.array[x+xo][y+yo] == 1:
-                                berührt = True
-                                break
-                        except IndexError:
-                            pass
-                    if berührt:
-                        break
-                if not berührt:
-                    return False
-
-                if diagonalen:
-                    continue
-                # Teste ob diagonal zu der Position sich mindestens ein Quadrat
-                # befindet.
-                try:
-                    # Rechts-Oben
-                    if self.array[i+1][j+1] == 1 and self.array[i+1][j] == 0 and self.array[i][j+1] == 0:
-                        diagonalen = True
-                except IndexError:
-                    pass
-                try:
-                    # Rechts-Unten
-                    if self.array[i+1][j-1] == 1 and self.array[i+1][j] == 0 and self.array[i][j-1] == 0:
-                        diagonalen = True
-                except IndexError:
-                    pass
-                try:
-                    # Links-Oben
-                    if self.array[i-1][j+1] == 1 and self.array[i-1][j] == 0 and self.array[i][j+1] == 0:
-                        diagonalen = True
-                except IndexError:
-                    pass
-                try:
-                    # Links-Unten
-                    if self.array[i-1][j-1] == 1 and self.array[i-1][j] == 0 and self.array[i][j-1] == 0:
-                        diagonalen = True
-                except IndexError:
-                    pass
-        return diagonalen
+        # Teste ob mindestens eine diagonale Verbindung vorhanden ist
+        for x, y in gefunden:
+            if (x + 1, y + 1) in gefunden and (x + 1, y) not in gefunden and (x, y + 1) not in gefunden:
+                return True
+            if (x + 1, y - 1) in gefunden and (x + 1, y) not in gefunden and (x, y - 1) not in gefunden:
+                return True
+            if (x - 1, y + 1) in gefunden and (x - 1, y) not in gefunden and (x, y + 1) not in gefunden:
+                return True
+            if (x - 1, y - 1) in gefunden and (x - 1, y) not in gefunden and (x, y - 1) not in gefunden:
+                return True
+        return False
 
     def deckungsgleich(self, array1, array2=None, rotation=0):
         """
@@ -89,7 +66,7 @@ class Romino:
 
         # Rotiere den zweiten Romino
         rotierte_array2 = numpy.rot90(array2)
-        
+
         # Verschiebe Rominos an den Nullpunkt
         min_x1 = len(array1)
         min_y1 = len(array1)
@@ -108,10 +85,11 @@ class Romino:
         verschobene_array2 = numpy.roll(numpy.roll(
             rotierte_array2, -min_x2, axis=0), -min_y2, axis=1)
 
-        return (verschobene_array1 == rotierte_array2).all() or \
-            (verschobene_array1 == numpy.flip(rotierte_array2, 0)).all() or \
-            (verschobene_array1 == numpy.flip(rotierte_array2, 1)).all() or \
-            self.deckungsgleich(verschobene_array1, rotierte_array2, rotation + 1)
+        return (verschobene_array1 == verschobene_array2).all() or \
+            (verschobene_array1 == numpy.flip(verschobene_array2, 0)).all() or \
+            (verschobene_array1 == numpy.flip(verschobene_array2, 1)).all() or \
+            self.deckungsgleich(verschobene_array1,
+                                verschobene_array2, rotation + 1)
 
     def render(self):
         bild = PIL.Image.new(
