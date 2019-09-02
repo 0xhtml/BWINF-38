@@ -14,6 +14,7 @@ class Romino:
         self.deckungsgleiche = {}
 
     def add(self, x, y):
+        """Diese Funktion fügt ein Quadrat zu dem Romino hinzu"""
         self.array[x][y] = 1
 
     def gültig(self):
@@ -56,11 +57,30 @@ class Romino:
 
     @staticmethod
     def verschieben(array):
+        """
+        Diese Funktion verschiebt die Quadrate eines Rominos an die x- und
+        y-Achse.
+
+        +------>
+        |
+        |  XX
+        |   X
+        V
+
+        Aus dieser Anordnung z.B. wird die untere Anordnung. (Der Nullpunkt beider
+        Achsen vefindet sich oben links.)
+
+        +------>
+        |XX
+        | X
+        |
+        V
+        """
+        # Ermittle die mini- und maximalen X- und Y-Position
         min_x = array.shape[0]
         min_y = array.shape[1]
         max_x = 0
         max_y = 0
-
         for x in range(array.shape[0]):
             for y in range(array.shape[1]):
                 if array[x][y] == 0:
@@ -71,38 +91,61 @@ class Romino:
                 max_x = max(x, max_x)
                 max_y = max(y, max_y)
 
+        # Entferne alles bis and die mini- und maximalen Positionen
         return array[min_x:max_x + 1, min_y:max_y + 1]
 
-    def gleich(self, array1, array2, rotation=0, spiegeln=False):
-        size = len(array1)
+    @staticmethod
+    def gleich(array1, array2, rotation=0, spiegeln=False):
+        """
+        Diese Funktion testet ob zwei Rominos gleich sind. Hierzu kann der
+        erste Romino gedreht und gespiegelt werden.
 
+        Die Funktion gibt einen Tupel aus dem Ergebnis des Vergleichs (True
+        oder False) und den neu rotierten/gespiegelten ersten Romino zurück. 
+        """
+        # Rotiere den ersten Romino
         if rotation != 0:
             array1 = numpy.rot90(array1, rotation)
+
+        # Spiegel den ersten Romino
         if spiegeln:
             array1 = numpy.flip(array1, 1)
 
+        # Vergleiche die beiden Rominos
         ergebnis = array1.shape == array2.shape and (array1 == array2).all()
         return ergebnis, array1
 
     def deckungsgleich(self, array):
         """
-        Diese Funktion testet ob zwei Rominos durch drehen, spiegeln und
-        verschieben deckungsgleich sind.
+        Diese Funktion testet ob dieser und ein anderer Romino durch drehen,
+        spiegeln und verschieben deckungsgleich sind.
         """
+        # Rominos verschieben
         array1 = self.verschieben(self.array)
         array2 = self.verschieben(array)
 
+        # Gehe durch alle Rotations- und Spiegelmöglichkeiten
         rotationen = (0, 1, 2, 3)
         for rotation in rotationen:
             for spiegeln in [True, False]:
+                # Teste ob dieser Romino bereits rotiert/gepsiegelt wurde
                 if (rotation, spiegeln) in self.deckungsgleiche.keys():
+                    # Nutze den bereits rotiert/gepsiegelten Romino
                     array3 = self.deckungsgleiche[(rotation, spiegeln)]
+
+                    # Vergleiche die beiden Rominos
                     if self.gleich(array3, array2)[0]:
                         return True
                 else:
+                    # Vergleiche und rotiere/spiegel die beiden Rominos
                     gleich, array3 = self.gleich(
                         array1, array2, rotation, spiegeln)
+                    
+                    # Füge den rotiert/gepsiegelten Romino zu den
+                    # deckungsgleichen Rominos hinzu um bei erneutem vergleichen
+                    # Zeit zu sparen
                     self.deckungsgleiche[(rotation, spiegeln)] = array3
+
                     if gleich:
                         return True
         return False
