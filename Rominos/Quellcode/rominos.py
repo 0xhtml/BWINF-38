@@ -11,6 +11,7 @@ class Romino:
 
     def __init__(self, n):
         self.array = numpy.zeros((n, n))
+        self.deckungsgleiche = {}
 
     def add(self, x, y):
         self.array[x][y] = 1
@@ -53,50 +54,57 @@ class Romino:
                 return True
         return False
 
-    def gleich(self, array1, array2, rotation, spiegeln):
+    @staticmethod
+    def verschieben(array):
+        min_x = array.shape[0]
+        min_y = array.shape[1]
+        max_x = 0
+        max_y = 0
+
+        for x in range(array.shape[0]):
+            for y in range(array.shape[1]):
+                if array[x][y] == 0:
+                    continue
+
+                min_x = min(x, min_x)
+                min_y = min(y, min_y)
+                max_x = max(x, max_x)
+                max_y = max(y, max_y)
+
+        return array[min_x:max_x + 1, min_y:max_y + 1]
+
+    def gleich(self, array1, array2, rotation=0, spiegeln=False):
         size = len(array1)
-        
+
         if rotation != 0:
-            array2 = numpy.rot90(array2, rotation)
+            array1 = numpy.rot90(array1, rotation)
         if spiegeln:
-            array2 = numpy.flip(array2, 1)
+            array1 = numpy.flip(array1, 1)
 
-        min_x1 = size
-        min_y1 = size
-        max_x1 = 0
-        max_y1 = 0
-        min_x2 = size
-        min_y2 = size
-        max_x2 = 0
-        max_y2 = 0
-        for x in range(size):
-            for y in range(size):
-                if array1[x][y] == 1:
-                    min_x1 = min(x, min_x1)
-                    min_y1 = min(y, min_y1)
-                    max_x1 = max(x, max_x1)
-                    max_y1 = max(y, max_y1)
-                if array2[x][y] == 1:
-                    min_x2 = min(x, min_x2)
-                    min_y2 = min(y, min_y2)
-                    max_x2 = max(x, max_x2)
-                    max_y2 = max(y, max_y2)
-        array1 = array1[min_x1:max_x1 + 1, min_y1:max_y1 + 1]
-        array2 = array2[min_x2:max_x2 + 1, min_y2:max_y2 + 1]
-
-        return array1.shape == array2.shape and (array1 == array2).all()
+        ergebnis = array1.shape == array2.shape and (array1 == array2).all()
+        return ergebnis, array1
 
     def deckungsgleich(self, array):
         """
         Diese Funktion testet ob zwei Rominos durch drehen, spiegeln und
         verschieben deckungsgleich sind.
         """
+        array1 = self.verschieben(self.array)
+        array2 = self.verschieben(array)
+
         rotationen = (0, 1, 2, 3)
         for rotation in rotationen:
-            if self.gleich(self.array, array, rotation, False):
-                return True
-            if self.gleich(self.array, array, rotation, True):
-                return True
+            for spiegeln in [True, False]:
+                if (rotation, spiegeln) in self.deckungsgleiche.keys():
+                    array3 = self.deckungsgleiche[(rotation, spiegeln)]
+                    if self.gleich(array3, array2)[0]:
+                        return True
+                else:
+                    gleich, array3 = self.gleich(
+                        array1, array2, rotation, spiegeln)
+                    self.deckungsgleiche[(rotation, spiegeln)] = array3
+                    if gleich:
+                        return True
         return False
 
     def render(self, draw, x, y):
@@ -109,7 +117,8 @@ class Romino:
             for y2 in range(len(self.array)):
                 if self.array[x2][y2] == 1:
                     draw.rectangle(
-                        [(x2 * 10 + x, y2 * 10 + y), (x2 * 10 + 10 + x, y2 * 10 + 10 + y)],
+                        [(x2 * 10 + x, y2 * 10 + y),
+                         (x2 * 10 + 10 + x, y2 * 10 + 10 + y)],
                         (0xcf, 0x2b, 0x1d),
                         (0, 0, 0)
                     )
@@ -159,7 +168,8 @@ if __name__ == "__main__":
     größe = 1
     while größe * größe < len(gültige_rominos):
         größe += 1
-    bild = PIL.Image.new("RGB", ((n + 1) * 10 * größe - 9, (n + 1) * 10 * größe - 9))
+    bild = PIL.Image.new(
+        "RGB", ((n + 1) * 10 * größe - 9, (n + 1) * 10 * größe - 9))
     draw = PIL.ImageDraw.Draw(bild)
     draw.rectangle((0, 0) + bild.size, (255, 255, 255))
     x = 0
