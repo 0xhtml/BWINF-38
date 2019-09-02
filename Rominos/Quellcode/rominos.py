@@ -1,4 +1,4 @@
-#!./env/bin/python3
+#!/usr/bin/python3
 import sys
 import itertools
 import numpy
@@ -53,30 +53,38 @@ class Romino:
                 return True
         return False
 
-    def gleich(self, array1, array2, rotation=0, flip=0):
+    def gleich(self, array1, array2, rotation, spiegeln):
         size = len(array1)
         
         if rotation != 0:
             array2 = numpy.rot90(array2, rotation)
-        if flip != 0:
-            array2 = numpy.flip(array2, flip - 1)
+        if spiegeln:
+            array2 = numpy.flip(array2, 1)
 
         min_x1 = size
         min_y1 = size
+        max_x1 = 0
+        max_y1 = 0
         min_x2 = size
         min_y2 = size
+        max_x2 = 0
+        max_y2 = 0
         for x in range(size):
             for y in range(size):
                 if array1[x][y] == 1:
                     min_x1 = min(x, min_x1)
                     min_y1 = min(y, min_y1)
+                    max_x1 = max(x, max_x1)
+                    max_y1 = max(y, max_y1)
                 if array2[x][y] == 1:
                     min_x2 = min(x, min_x2)
                     min_y2 = min(y, min_y2)
-        array1 = numpy.roll(numpy.roll(array1, -min_x1, axis=0), -min_y1, axis=1)
-        array2 = numpy.roll(numpy.roll(array2, -min_x2, axis=0), -min_y2, axis=1)
+                    max_x2 = max(x, max_x2)
+                    max_y2 = max(y, max_y2)
+        array1 = array1[min_x1:max_x1 + 1, min_y1:max_y1 + 1]
+        array2 = array2[min_x2:max_x2 + 1, min_y2:max_y2 + 1]
 
-        return (array1 == array2).all()
+        return array1.shape == array2.shape and (array1 == array2).all()
 
     def deckungsgleich(self, array):
         """
@@ -84,11 +92,11 @@ class Romino:
         verschieben deckungsgleich sind.
         """
         rotationen = (0, 1, 2, 3)
-        flips = (0, 1, 2)
         for rotation in rotationen:
-            for flip in flips:
-                if self.gleich(self.array, array, rotation, flip):
-                    return True
+            if self.gleich(self.array, array, rotation, False):
+                return True
+            if self.gleich(self.array, array, rotation, True):
+                return True
         return False
 
     def render(self, draw, x, y):
