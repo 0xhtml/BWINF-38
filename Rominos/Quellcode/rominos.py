@@ -45,13 +45,21 @@ class Romino:
 
         # Teste ob mindestens eine diagonale Verbindung vorhanden ist
         for x, y in gefunden:
-            if (x + 1, y + 1) in gefunden and (x + 1, y) not in gefunden and (x, y + 1) not in gefunden:
+            if (x + 1, y + 1) in gefunden and \
+                (x + 1, y) not in gefunden and \
+                    (x, y + 1) not in gefunden:
                 return True
-            if (x + 1, y - 1) in gefunden and (x + 1, y) not in gefunden and (x, y - 1) not in gefunden:
+            if (x + 1, y - 1) in gefunden and \
+                (x + 1, y) not in gefunden and \
+                    (x, y - 1) not in gefunden:
                 return True
-            if (x - 1, y + 1) in gefunden and (x - 1, y) not in gefunden and (x, y + 1) not in gefunden:
+            if (x - 1, y + 1) in gefunden and \
+                (x - 1, y) not in gefunden and \
+                    (x, y + 1) not in gefunden:
                 return True
-            if (x - 1, y - 1) in gefunden and (x - 1, y) not in gefunden and (x, y - 1) not in gefunden:
+            if (x - 1, y - 1) in gefunden and \
+                (x - 1, y) not in gefunden and \
+                    (x, y - 1) not in gefunden:
                 return True
         return False
 
@@ -67,8 +75,8 @@ class Romino:
         |   X
         V
 
-        Aus dieser Anordnung z.B. wird die untere Anordnung. (Der Nullpunkt beider
-        Achsen vefindet sich oben links.)
+        Aus dieser Anordnung z.B. wird die untere Anordnung. (Der Nullpunkt
+        beider Achsen befindet sich oben links.)
 
         +------>
         |XX
@@ -140,7 +148,7 @@ class Romino:
                     # Vergleiche und rotiere/spiegel die beiden Rominos
                     gleich, array3 = self.gleich(
                         array1, array2, rotation, spiegeln)
-                    
+
                     # Füge den rotiert/gepsiegelten Romino zu den
                     # deckungsgleichen Rominos hinzu um bei erneutem vergleichen
                     # Zeit zu sparen
