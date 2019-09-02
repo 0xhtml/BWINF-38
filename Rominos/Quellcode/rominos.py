@@ -94,10 +94,14 @@ class Romino:
                 if array[x][y] == 0:
                     continue
 
-                min_x = min(x, min_x)
-                min_y = min(y, min_y)
-                max_x = max(x, max_x)
-                max_y = max(y, max_y)
+                if x < min_x:
+                    min_x = x
+                if y < min_y:
+                    min_y = y
+                if x > max_x:
+                    max_x = x
+                if y > max_y:
+                    max_y = y
 
         # Entferne alles bis and die mini- und maximalen Positionen
         return array[min_x:max_x + 1, min_y:max_y + 1]
