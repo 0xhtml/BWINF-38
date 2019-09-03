@@ -194,7 +194,7 @@ if __name__ == "__main__":
 
     # Generiere alle möglichen Rominos
     def möglichkeiten(n=n, p=[]):
-        res = set()
+        res = []
         for i in mögliche_quadrate:
             if i in p:
                 continue
@@ -210,16 +210,14 @@ if __name__ == "__main__":
                 continue
 
             if n == 1:
-                res.add((i,))
+                res.append([i])
             else:
                 for j in möglichkeiten(n - 1, p + [i]):
-                    res.add((i,) + j)
+                    c = sorted([i] + j)
+                    if c not in res:
+                        res.append(c)
         return res
-    alle_möglichen_rominos = möglichkeiten()
-
-    # Entferne doppelte möglichkeiten
-    mögliche_rominos = itertools.filterfalse(
-        lambda x: sorted(x) != list(x), alle_möglichen_rominos)
+    mögliche_rominos = möglichkeiten()
 
     # Teste alle möglichen Rominos auf Gültigkeit
     gültige_rominos = set()
