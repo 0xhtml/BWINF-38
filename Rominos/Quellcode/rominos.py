@@ -9,13 +9,34 @@ import PIL.ImageDraw
 class Romino:
     """Ein einzelner Romino bestehend aus n Quadraten"""
 
-    def __init__(self, n):
-        self.array = numpy.zeros((n, n))
-        self.deckungsgleiche = {}
+    def __init__(self, array):
+        # Speichere die ursprüngliche Größe
+        self.größe = len(array)
 
-    def add(self, x, y):
-        """Diese Funktion fügt ein Quadrat zu dem Romino hinzu"""
-        self.array[x][y] = 1
+        # Ermittle die mini- und maximalen X- und Y-Position
+        min_x = array.shape[0]
+        min_y = array.shape[1]
+        max_x = 0
+        max_y = 0
+        for x in range(array.shape[0]):
+            for y in range(array.shape[1]):
+                if array[x][y] == 0:
+                    continue
+
+                if x < min_x:
+                    min_x = x
+                if y < min_y:
+                    min_y = y
+                if x > max_x:
+                    max_x = x
+                if y > max_y:
+                    max_y = y
+
+        # Entferne alles bis and die mini- und maximalen Positionen
+        self.array = array[min_x:max_x + 1, min_y:max_y + 1]
+
+        # Erstelle Dict für desckungsgleiche Rominos
+        self.deckungsgleiche = {}
 
     def gültig(self):
         """
@@ -27,8 +48,8 @@ class Romino:
         """
         # Teste ob alle Quadrate mit einander verbunden sind
         gefunden = []
-        for x in range(len(self.array)):
-            for y in range(len(self.array)):
+        for x in range(self.array.shape[0]):
+            for y in range(self.array.shape[1]):
                 if self.array[x][y] == 1:
                     if (x+1, y+1) in gefunden or \
                             (x+1, y) in gefunden or \
@@ -63,51 +84,7 @@ class Romino:
                 return True
         return False
 
-    @staticmethod
-    def verschieben(array):
-        """
-        Diese Funktion verschiebt die Quadrate eines Rominos an die x- und
-        y-Achse.
-
-        +------>
-        |
-        |  XX
-        |   X
-        V
-
-        Aus dieser Anordnung z.B. wird die untere Anordnung. (Der Nullpunkt
-        beider Achsen befindet sich oben links.)
-
-        +------>
-        |XX
-        | X
-        |
-        V
-        """
-        # Ermittle die mini- und maximalen X- und Y-Position
-        min_x = array.shape[0]
-        min_y = array.shape[1]
-        max_x = 0
-        max_y = 0
-        for x in range(array.shape[0]):
-            for y in range(array.shape[1]):
-                if array[x][y] == 0:
-                    continue
-
-                if x < min_x:
-                    min_x = x
-                if y < min_y:
-                    min_y = y
-                if x > max_x:
-                    max_x = x
-                if y > max_y:
-                    max_y = y
-
-        # Entferne alles bis and die mini- und maximalen Positionen
-        return array[min_x:max_x + 1, min_y:max_y + 1]
-
-    @staticmethod
-    def gleich(array1, array2, rotation=0, spiegeln=False):
+    def gleich(self, array1, array2=None, rotation=0, spiegeln=False):
         """
         Diese Funktion testet ob zwei Rominos gleich sind. Hierzu kann der
         erste Romino gedreht und gespiegelt werden.
@@ -115,6 +92,11 @@ class Romino:
         Die Funktion gibt einen Tupel aus dem Ergebnis des Vergleichs (True
         oder False) und den neu rotierten/gespiegelten ersten Romino zurück. 
         """
+        # Wenn kein zeiter Romino angegeben wurde
+        if array2 is None:
+            # Setzte den zweiten Romino auf diesen Romino
+            array2 = self.array
+
         # Rotiere den ersten Romino
         if rotation != 0:
             array1 = numpy.rot90(array1, rotation)
@@ -132,10 +114,6 @@ class Romino:
         Diese Funktion testet ob dieser und ein anderer Romino durch drehen,
         spiegeln und verschieben deckungsgleich sind.
         """
-        # Rominos verschieben
-        array1 = self.verschieben(self.array)
-        array2 = self.verschieben(array)
-
         # Gehe durch alle Rotations- und Spiegelmöglichkeiten
         rotationen = (0, 1, 2, 3)
         for rotation in rotationen:
@@ -143,20 +121,20 @@ class Romino:
                 # Teste ob dieser Romino bereits rotiert/gepsiegelt wurde
                 if (rotation, spiegeln) in self.deckungsgleiche.keys():
                     # Nutze den bereits rotiert/gepsiegelten Romino
-                    array3 = self.deckungsgleiche[(rotation, spiegeln)]
+                    array1 = self.deckungsgleiche[(rotation, spiegeln)]
 
                     # Vergleiche die beiden Rominos
-                    if self.gleich(array3, array2)[0]:
+                    if self.gleich(array1, array)[0]:
                         return True
                 else:
                     # Vergleiche und rotiere/spiegel die beiden Rominos
-                    gleich, array3 = self.gleich(
-                        array1, array2, rotation, spiegeln)
+                    gleich, array1 = self.gleich(
+                        self.array, array, rotation, spiegeln)
 
                     # Füge den rotiert/gepsiegelten Romino zu den
                     # deckungsgleichen Rominos hinzu um bei erneutem vergleichen
                     # Zeit zu sparen
-                    self.deckungsgleiche[(rotation, spiegeln)] = array3
+                    self.deckungsgleiche[(rotation, spiegeln)] = array1
 
                     if gleich:
                         return True
@@ -164,12 +142,12 @@ class Romino:
 
     def render(self, draw, x, y):
         draw.rectangle(
-            [(x, y), (x + len(self.array) * 10, y + len(self.array) * 10)],
+            [(x, y), (x + self.größe * 10, y + self.größe * 10)],
             None,
             (100, 100, 100)
         )
-        for x2 in range(len(self.array)):
-            for y2 in range(len(self.array)):
+        for x2 in range(self.array.shape[0]):
+            for y2 in range(self.array.shape[1]):
                 if self.array[x2][y2] == 1:
                     draw.rectangle(
                         [(x2 * 10 + x, y2 * 10 + y),
@@ -204,12 +182,15 @@ if __name__ == "__main__":
     # Teste alle möglichen Rominos auf Gültigkeit
     gültige_rominos = []
     for romino_quadrate in mögliche_rominos:
-        # Erstelle neuen Romino
-        romino = Romino(n)
+        # Erstelle leeren Romino
+        array = numpy.zeros((n, n))
 
         # Füge Quadrate zu Romino hinzu
         for quadrat in romino_quadrate:
-            romino.add(*quadrat)
+            array[quadrat] = 1
+
+        # Erstelle Romino
+        romino = Romino(array)
 
         # Teste Gültigkeit des Romino
         if romino.gültig():
