@@ -109,30 +109,9 @@ class Romino:
                 return True
         return False
 
-    def gleich(self, array1, array2=None, rotation=0, spiegeln=False):
-        """
-        Diese Funktion testet ob zwei Rominos gleich sind. Hierzu kann der
-        erste Romino gedreht und gespiegelt werden.
-
-        Die Funktion gibt einen Tupel aus dem Ergebnis des Vergleichs (True
-        oder False) und den neu rotierten/gespiegelten ersten Romino zurück. 
-        """
-        # Wenn kein zeiter Romino angegeben wurde
-        if array2 is None:
-            # Setzte den zweiten Romino auf diesen Romino
-            array2 = self.array
-
-        # Rotiere den ersten Romino
-        if rotation != 0:
-            array1 = numpy.rot90(array1, rotation)
-
-        # Spiegel den ersten Romino
-        if spiegeln:
-            array1 = numpy.flip(array1, 1)
-
-        # Vergleiche die beiden Rominos
-        ergebnis = array1.shape == array2.shape and (array1 == array2).all()
-        return ergebnis, array1
+    def gleich(self, array):
+        """Diese Funktion testet ob zwei Rominos gleich sind."""
+        return self.array.shape == array.shape and (self.array == array).all()
 
     def deckungsgleich(self, romino):
         """
@@ -142,33 +121,46 @@ class Romino:
         # Verschiebe die Rominos
         self.verschieben()
         romino.verschieben()
+
+        # Lade den Romino
+        array = self.array
+
         # Lade bereits gespeicherte rotiert/gepsiegelte Rominos
         gespeichert = self.deckungsgleiche.keys()
 
-        # Gehe durch alle Rotations- und Spiegelmöglichkeiten
+        # Gehe durch alle Rotationen
         rotationen = (0, 1, 2, 3)
         for rotation in rotationen:
+            # Rotiere den Romino
+            if (rotation, False) in gespeichert:
+                array = self.deckungsgleiche[(rotation, False)]
+            else:
+                if rotation != 0:
+                    array = numpy.rot90(array)
+
+                    # Speichere den rotierten Romino ab
+                    self.deckungsgleiche[(rotation, False)] = array
+
+            # Gehe durch alle Spiegelungen
             for spiegeln in (True, False):
-                # Teste ob dieser Romino bereits rotiert/gepsiegelt wurde
-                if (rotation, spiegeln) in gespeichert:
-                    # Nutze den bereits rotiert/gepsiegelten Romino
-                    array1 = self.deckungsgleiche[(rotation, spiegeln)]
+                # Teste ob der Romino gespiegelt werden soll
+                if spiegeln:
+                    if (rotation, True) in gespeichert:
+                        gespiegeltes_array = self.deckungsgleiche[(
+                            rotation, True)]
+                    else:
+                        # Spiegel den Romino
+                        gespiegeltes_array = numpy.flip(array, 1)
 
-                    # Vergleiche die beiden Rominos
-                    if self.gleich(array1, romino.array)[0]:
-                        return True
+                        # Speichere den gespiegelten Romino ab
+                        self.deckungsgleiche[(
+                            rotation, True)] = gespiegeltes_array
                 else:
-                    # Vergleiche und rotiere/spiegel die beiden Rominos
-                    gleich, array1 = self.gleich(
-                        self.array, romino.array, rotation, spiegeln)
+                    gespiegeltes_array = array
 
-                    # Füge den rotiert/gepsiegelten Romino zu den
-                    # deckungsgleichen Rominos hinzu um bei erneutem vergleichen
-                    # Zeit zu sparen
-                    self.deckungsgleiche[(rotation, spiegeln)] = array1
-
-                    if gleich:
-                        return True
+                # Vergleiche die beiden Rominos
+                if romino.gleich(gespiegeltes_array):
+                    return True
         return False
 
     def render(self, draw, x, y):
