@@ -199,14 +199,14 @@ if __name__ == "__main__":
             if i in p:
                 continue
             if len(p) != 0 and \
-                    p[-1] != (i[0]+1, i[1]+1) and \
-                    p[-1] != (i[0]+1, i[1]) and \
-                    p[-1] != (i[0]+1, i[1]-1) and \
-                    p[-1] != (i[0], i[1]+1) and \
-                    p[-1] != (i[0]+1, i[1]-1) and \
-                    p[-1] != (i[0]-1, i[1]+1) and \
-                    p[-1] != (i[0]-1, i[1]) and \
-                    p[-1] != (i[0]-1, i[1]-1):
+                    (i[0]+1, i[1]+1) not in p and \
+                    (i[0]+1, i[1]) not in p and \
+                    (i[0]+1, i[1]-1) not in p and \
+                    (i[0], i[1]+1) not in p and \
+                    (i[0]+1, i[1]-1) not in p and \
+                    (i[0]-1, i[1]+1) not in p and \
+                    (i[0]-1, i[1]) not in p and \
+                    (i[0]-1, i[1]-1) not in p:
                 continue
 
             if n == 1:
@@ -215,7 +215,11 @@ if __name__ == "__main__":
                 for j in möglichkeiten(n - 1, p + [i]):
                     res.add((i,) + j)
         return res
-    mögliche_rominos = möglichkeiten()
+    alle_möglichen_rominos = möglichkeiten()
+
+    # Entferne doppelte möglichkeiten
+    mögliche_rominos = itertools.filterfalse(
+        lambda x: sorted(x) != list(x), alle_möglichen_rominos)
 
     # Teste alle möglichen Rominos auf Gültigkeit
     gültige_rominos = set()
