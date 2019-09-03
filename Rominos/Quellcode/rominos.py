@@ -71,42 +71,35 @@ class Romino:
         Für eine gültige Kombination müssen sich mindestens einmal zwei Quadrate
         nur mit der Ecke (also diagonal) berühren.
         """
-        # Teste ob alle Quadrate mit einander verbunden sind
-        gefunden = set()
+        # Teste ob mindestens eine diagonale Verbindung vorhanden ist
         for x in range(self.array.shape[0]):
             for y in range(self.array.shape[1]):
-                if self.array[x][y] == 1:
-                    if (x+1, y+1) in gefunden or \
-                            (x+1, y) in gefunden or \
-                            (x+1, y-1) in gefunden or \
-                            (x, y+1) in gefunden or \
-                            (x, y-1) in gefunden or \
-                            (x-1, y+1) in gefunden or \
-                            (x-1, y) in gefunden or \
-                            (x-1, y-1) in gefunden or \
-                            len(gefunden) == 0:
-                        gefunden.add((x, y))
-                    else:
-                        return False
-
-        # Teste ob mindestens eine diagonale Verbindung vorhanden ist
-        for x, y in gefunden:
-            if (x + 1, y + 1) in gefunden and \
-                (x + 1, y) not in gefunden and \
-                    (x, y + 1) not in gefunden:
-                return True
-            if (x + 1, y - 1) in gefunden and \
-                (x + 1, y) not in gefunden and \
-                    (x, y - 1) not in gefunden:
-                return True
-            if (x - 1, y + 1) in gefunden and \
-                (x - 1, y) not in gefunden and \
-                    (x, y + 1) not in gefunden:
-                return True
-            if (x - 1, y - 1) in gefunden and \
-                (x - 1, y) not in gefunden and \
-                    (x, y - 1) not in gefunden:
-                return True
+                if self.array[x][y] == 0:
+                    continue
+                try:
+                    # Rechts-Oben
+                    if self.array[x+1][y+1] == 1 and self.array[x+1][y] == 0 and self.array[x][y+1] == 0:
+                        return True
+                except IndexError:
+                    pass
+                try:
+                    # Rechts-Unten
+                    if self.array[x+1][y-1] == 1 and self.array[x+1][y] == 0 and self.array[x][y-1] == 0:
+                        return True
+                except IndexError:
+                    pass
+                try:
+                    # Links-Oben
+                    if self.array[x-1][y+1] == 1 and self.array[x-1][y] == 0 and self.array[x][y+1] == 0:
+                        return True
+                except IndexError:
+                    pass
+                try:
+                    # Links-Unten
+                    if self.array[x-1][y-1] == 1 and self.array[x-1][y] == 0 and self.array[x][y-1] == 0:
+                        return True
+                except IndexError:
+                    pass
         return False
 
     def gleich(self, array):
@@ -200,7 +193,29 @@ if __name__ == "__main__":
             mögliche_quadrate.add((x, y))
 
     # Generiere alle möglichen Rominos
-    mögliche_rominos = itertools.combinations(mögliche_quadrate, n)
+    def möglichkeiten(n=n, p=[]):
+        res = set()
+        for i in mögliche_quadrate:
+            if i in p:
+                continue
+            if len(p) != 0 and \
+                    p[-1] != (i[0]+1, i[1]+1) and \
+                    p[-1] != (i[0]+1, i[1]) and \
+                    p[-1] != (i[0]+1, i[1]-1) and \
+                    p[-1] != (i[0], i[1]+1) and \
+                    p[-1] != (i[0]+1, i[1]-1) and \
+                    p[-1] != (i[0]-1, i[1]+1) and \
+                    p[-1] != (i[0]-1, i[1]) and \
+                    p[-1] != (i[0]-1, i[1]-1):
+                continue
+
+            if n == 1:
+                res.add((i,))
+            else:
+                for j in möglichkeiten(n - 1, p + [i]):
+                    res.add((i,) + j)
+        return res
+    mögliche_rominos = möglichkeiten()
 
     # Teste alle möglichen Rominos auf Gültigkeit
     gültige_rominos = set()
