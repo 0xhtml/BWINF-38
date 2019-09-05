@@ -6,6 +6,11 @@ import PIL.Image
 import PIL.ImageDraw
 
 
+class ndenumerate(numpy.ndenumerate):
+    def __init__(self, arr):
+        self.iter = arr.flat
+
+
 class Romino:
     """Ein einzelner Romino bestehend aus n Quadraten"""
 
@@ -91,7 +96,7 @@ class Romino:
             return gefunden
 
         # Suche nach dem ersten Quadrat
-        for position, wert in numpy.ndenumerate(self.array):
+        for position, wert in ndenumerate(self.array):
             # Beende bei der ersten gefundenen Position
             if wert == 1:
                 break
@@ -165,7 +170,7 @@ class Romino:
                             rotation, True)]
                     else:
                         # Spiegel den Romino
-                        gespiegeltes_array = numpy.flip(array, 1)
+                        gespiegeltes_array = array[::-1, :]
 
                         # Speichere den gespiegelten Romino ab
                         self.deckungsgleiche[(
