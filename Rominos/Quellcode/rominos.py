@@ -71,35 +71,57 @@ class Romino:
         Für eine gültige Kombination müssen sich mindestens einmal zwei Quadrate
         nur mit der Ecke (also diagonal) berühren.
         """
-        # Teste ob mindestens eine diagonale Verbindung vorhanden ist
-        for x in range(self.array.shape[0]):
-            for y in range(self.array.shape[1]):
-                if self.array[x][y] == 0:
+        # Teste ob alle Quadrate mit einander verbunden sind
+        def suche(position, gefunden=set()):
+            x, y = position
+            o = {(-1, -1), (-1, 0), (-1, 1), (0, -1),
+                 (0, 1), (1, -1), (1, 0), (1, 1)}
+            for xo, yo in o:
+                if len(gefunden) == self.größe:
+                    break
+                if (x + xo) < 0 or \
+                    (y + yo) < 0 or \
+                    (x + xo) >= self.array.shape[0] or \
+                    (y + yo) >= self.array.shape[1]:
                     continue
-                try:
-                    # Rechts-Oben
-                    if self.array[x+1][y+1] == 1 and self.array[x+1][y] == 0 and self.array[x][y+1] == 0:
-                        return True
-                except IndexError:
-                    pass
-                try:
-                    # Rechts-Unten
-                    if self.array[x+1][y-1] == 1 and self.array[x+1][y] == 0 and self.array[x][y-1] == 0:
-                        return True
-                except IndexError:
-                    pass
-                try:
-                    # Links-Oben
-                    if self.array[x-1][y+1] == 1 and self.array[x-1][y] == 0 and self.array[x][y+1] == 0:
-                        return True
-                except IndexError:
-                    pass
-                try:
-                    # Links-Unten
-                    if self.array[x-1][y-1] == 1 and self.array[x-1][y] == 0 and self.array[x][y-1] == 0:
-                        return True
-                except IndexError:
-                    pass
+                position = (x + xo, y + yo)
+                if self.array[x + xo][y + yo] == 1 and position not in gefunden:
+                    gefunden.add(position)
+                    suche(position, gefunden)
+            return gefunden
+
+        # Suche nach dem ersten Quadrat
+        for position, wert in numpy.ndenumerate(self.array):
+            # Beende bei der ersten gefundenen Position
+            if wert == 1:
+                break
+
+        # Suche nach allen verbundenen Quadraten
+        verbundene_quadrate = suche(position, {position})
+
+        # Teste ob alle Quadrate gefunden wurden
+        if len(verbundene_quadrate) != self.größe:
+            # Es wurden nicht alle Quadrate gefunde. Das heißt, dass nicht
+            # alle Quadrate verbuden sind.
+            return False
+
+        # Teste ob mindestens eine diagonale Verbindung vorhanden ist:
+        # Gehe durch alle Quadrate
+        for (x, y) in verbundene_quadrate:
+            # Alle diagonalen Positionen
+            o = {(-1, -1), (-1, 1), (1, -1), (1, 1)}
+
+            # Gehe durch alle diagonalen Positionen
+            for xo, yo in o:
+                # Teste ob die diagonale Vorhanden ist und keine gerade
+                # Verbindung vorhanden ist
+                if (x + xo, y + yo) in verbundene_quadrate and \
+                    (x + xo, y) not in verbundene_quadrate and \
+                        (x, y + yo) not in verbundene_quadrate:
+                    # Es ist eine diagonale Verbindung vorhanden
+                    return True
+
+        # Es ist keine diagonale Verbindung vorhanden
         return False
 
     def gleich(self, array):
@@ -193,31 +215,7 @@ if __name__ == "__main__":
             mögliche_quadrate.add((x, y))
 
     # Generiere alle möglichen Rominos
-    def möglichkeiten(n=n, p=[]):
-        res = []
-        for i in mögliche_quadrate:
-            if i in p:
-                continue
-            if len(p) != 0 and \
-                    (i[0]+1, i[1]+1) not in p and \
-                    (i[0]+1, i[1]) not in p and \
-                    (i[0]+1, i[1]-1) not in p and \
-                    (i[0], i[1]+1) not in p and \
-                    (i[0]+1, i[1]-1) not in p and \
-                    (i[0]-1, i[1]+1) not in p and \
-                    (i[0]-1, i[1]) not in p and \
-                    (i[0]-1, i[1]-1) not in p:
-                continue
-
-            if n == 1:
-                res.append([i])
-            else:
-                for j in möglichkeiten(n - 1, p + [i]):
-                    c = sorted([i] + j)
-                    if c not in res:
-                        res.append(c)
-        return res
-    mögliche_rominos = möglichkeiten()
+    mögliche_rominos = itertools.combinations(mögliche_quadrate, n)
 
     # Teste alle möglichen Rominos auf Gültigkeit
     gültige_rominos = set()
