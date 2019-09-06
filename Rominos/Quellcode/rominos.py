@@ -13,18 +13,27 @@ class ndenumerate(numpy.ndenumerate):
         self.iter = arr.flat
 
 
-def rot90(m):
+def rot90(m, k=1):
     # Vereinfacht von
     # https://github.com/numpy/numpy/blob/17ff82a7f3ca49717128b89d1a5560f4545fda0f/numpy/lib/function_base.py#L73-L156
-    axes_list = arange(0, m.ndim)
-    (axes_list[0], axes_list[1]) = (axes_list[1], axes_list[0])
-    return numpy.transpose(flip(m), axes_list)
+    if k == 0:
+        return m[:]
+    elif k == 1:
+        return numpy.transpose(flip(m, 1), (1, 0))
+    elif k == 2:
+        return flip(flip(m, 0), 1)
+    else:
+        # k == 3
+        return flip(numpy.transpose(m, (1, 0)), 1)
 
 
-def flip(m):
+def flip(m, axes=0):
     # Vereinfacht von
     # https://github.com/numpy/numpy/blob/17ff82a7f3ca49717128b89d1a5560f4545fda0f/numpy/lib/function_base.py#L164-L254
-    return m[:, ::-1]
+    indexer = [slice(None)] * m.ndim
+    indexer[axes] = slice(None, None, -1)
+    indexer = tuple(indexer)
+    return m[indexer]
 
 
 class Romino:
@@ -158,22 +167,28 @@ class Romino:
         self.verschieben()
         romino.verschieben()
 
-        # Lade den Romino
-        array = self.array
+        # Teste ob das Format (Seitenlängen) der beiden Rominos gleich ist
+        if self.array.shape == romino.array.shape and \
+            self.array.shape == romino.array.shape[::-1]:
+            rotationen = {0, 1, 2, 3}
+        elif self.array.shape == romino.array.shape:
+            rotationen = {0, 2}
+        elif self.array.shape == romino.array.shape[::-1]:
+            rotationen = {1, 3}
+        else:
+            return False
 
         # Lade bereits gespeicherte rotiert/gepsiegelte Rominos
         gespeichert = self.deckungsgleiche.keys()
 
         # Gehe durch alle Rotationen
-        rotationen = (0, 1, 2, 3)
         for rotation in rotationen:
             # Rotiere den Romino
             if (rotation, False) in gespeichert:
                 array = self.deckungsgleiche[(rotation, False)]
             else:
+                array = rot90(self.array, rotation)
                 if rotation != 0:
-                    array = numpy.rot90(array)
-
                     # Speichere den rotierten Romino ab
                     self.deckungsgleiche[(rotation, False)] = array
 
