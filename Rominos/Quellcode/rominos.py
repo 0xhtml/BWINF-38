@@ -12,6 +12,7 @@ class ndenumerate(numpy.ndenumerate):
         # https://github.com/numpy/numpy/blob/c23bd98de665733dd090636f38b6aacf9f99450b/numpy/lib/index_tricks.py#L582-L583
         self.iter = arr.flat
 
+
 def rot90(m):
     # Vereinfacht von
     # https://github.com/numpy/numpy/blob/17ff82a7f3ca49717128b89d1a5560f4545fda0f/numpy/lib/function_base.py#L73-L156
@@ -19,10 +20,12 @@ def rot90(m):
     (axes_list[0], axes_list[1]) = (axes_list[1], axes_list[0])
     return numpy.transpose(flip(m), axes_list)
 
+
 def flip(m):
     # Vereinfacht von
     # https://github.com/numpy/numpy/blob/17ff82a7f3ca49717128b89d1a5560f4545fda0f/numpy/lib/function_base.py#L164-L254
     return m[:, ::-1]
+
 
 class Romino:
     """Ein einzelner Romino bestehend aus n Quadraten"""
@@ -98,9 +101,9 @@ class Romino:
                 if len(gefunden) == self.größe:
                     break
                 if (x + xo) < 0 or \
-                    (y + yo) < 0 or \
-                    (x + xo) >= self.array.shape[0] or \
-                    (y + yo) >= self.array.shape[1]:
+                        (y + yo) < 0 or \
+                        (x + xo) >= self.array.shape[0] or \
+                        (y + yo) >= self.array.shape[1]:
                     continue
                 position = (x + xo, y + yo)
                 if self.array[x + xo][y + yo] == 1 and position not in gefunden:
