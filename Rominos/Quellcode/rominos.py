@@ -125,24 +125,41 @@ class Romino:
         self.verschieben()
         romino.verschieben()
 
-        axen_tauschen_bools = [False, True]
-        spiegeln_bools = [(False, False), (True, False),
-                          (False, True), (True, True)]
-        for axen_tauschen_bool in axen_tauschen_bools:
-            if axen_tauschen_bool:
-                achsen_getauscht = self.achsen_tauschen(self.quadrate)
+        for achsen_tauschen_bool in [False, True]:
+            if achsen_tauschen_bool:
+                if (True, 0) in self.deckungsgleiche:
+                    achsen_getauscht = self.deckungsgleiche[(True, 0)]
+                else:
+                    achsen_getauscht = self.achsen_tauschen(self.quadrate)
+                    self.deckungsgleiche[(True, 0)] = achsen_getauscht
             else:
                 achsen_getauscht = self.quadrate
+            if romino.quadrate == achsen_getauscht:
+                return True
 
-            for spiegeln_bool in spiegeln_bools:
-                gespiegelt = achsen_getauscht
-                if spiegeln_bool[0]:
-                    gespiegelt = self.spiegeln(gespiegelt, 0)
-                if spiegeln_bool[1]:
-                    gespiegelt = self.spiegeln(gespiegelt, 1)
+            if (achsen_tauschen_bool, 1) in self.deckungsgleiche:
+                gespiegelt = self.deckungsgleiche[(achsen_tauschen_bool, 1)]
+            else:
+                gespiegelt = self.spiegeln(achsen_getauscht, 0)
+                self.deckungsgleiche[(achsen_tauschen_bool, 1)] = gespiegelt
+            if romino.quadrate == gespiegelt:
+                return True
 
-                if romino.quadrate == gespiegelt:
-                    return True
+            if (achsen_tauschen_bool, 2) in self.deckungsgleiche:
+                gespiegelt = self.deckungsgleiche[(achsen_tauschen_bool, 2)]
+            else:
+                gespiegelt = self.spiegeln(gespiegelt, 1)
+                self.deckungsgleiche[(achsen_tauschen_bool, 2)] = gespiegelt
+            if romino.quadrate == gespiegelt:
+                return True
+
+            if (achsen_tauschen_bool, 3) in self.deckungsgleiche:
+                gespiegelt = self.deckungsgleiche[(achsen_tauschen_bool, 3)]
+            else:
+                gespiegelt = self.spiegeln(achsen_getauscht, 1)
+                self.deckungsgleiche[(achsen_tauschen_bool, 3)] = gespiegelt
+            if romino.quadrate == gespiegelt:
+                return True
         return False
 
     def render(self, draw, x, y):
@@ -217,4 +234,4 @@ if __name__ == "__main__":
     draw.text((1, bild.height-10), str(len(gültige_rominos)), (0, 0, 0))
     bild.save(sys.argv[2])
 
-    print(time.time() - start)
+    print(time.time() - start, "s")
