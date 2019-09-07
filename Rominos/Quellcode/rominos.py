@@ -50,7 +50,8 @@ class Romino:
                     y = quadrat[1]
 
             # Verschiebe die Quadrate
-            self.quadrate = set(map(lambda q: (q[0] - x, q[1] - y), self.quadrate))
+            funktion = lambda q: (q[0] - x, q[1] - y)
+            self.quadrate = set(map(funktion, self.quadrate))
             self.verschoben = True
 
     def gültig(self):
