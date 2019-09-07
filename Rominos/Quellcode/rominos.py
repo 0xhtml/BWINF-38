@@ -169,7 +169,7 @@ class Romino:
 
         # Teste ob das Format (Seitenlängen) der beiden Rominos gleich ist
         if self.array.shape == romino.array.shape and \
-            self.array.shape == romino.array.shape[::-1]:
+                self.array.shape == romino.array.shape[::-1]:
             rotationen = {0, 1, 2, 3}
         elif self.array.shape == romino.array.shape:
             rotationen = {0, 2}
