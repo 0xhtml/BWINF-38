@@ -22,6 +22,9 @@ class Romino:
         # Erstelle Dict für desckungsgleiche Rominos
         self.deckungsgleiche = {}
 
+        self.nachbar_positionen = {(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1),
+            (1, -1), (1, 0), (1, 1)}
+
     def verschieben(self):
         """
         Diese Funktion verschiebt die Quadrate eines Rominos an die x- und
@@ -64,16 +67,11 @@ class Romino:
         """
         # Teste ob alle Quadrate mit einander verbunden sind
         def verbunden(position, gefunden):
-            x, y = position
-            o = {(-1, -1), (-1, 0), (-1, 1), (0, -1),
-                 (0, 1), (1, -1), (1, 0), (1, 1)}
-            for xo, yo in o:
-                if len(gefunden) == self.größe:
-                    break
-                position = (x + xo, y + yo)
-                if position in self.quadrate and position not in gefunden:
-                    gefunden.add(position)
-                    verbunden(position, gefunden)
+            for xo, yo in self.nachbar_positionen:
+                neue_position = (position[0] + xo, position[1] + yo)
+                if neue_position in self.quadrate and neue_position not in gefunden:
+                    gefunden.add(neue_position)
+                    verbunden(neue_position, gefunden)
             return len(gefunden)
 
         # Suche nach allen verbundenen Quadraten
@@ -126,41 +124,43 @@ class Romino:
         self.verschieben()
         romino.verschieben()
 
-        for achsen_tauschen_bool in [False, True]:
+        x1 = 0
+        y1 = 0
+        x2 = 0
+        y2 = 0
+        for quadrat in self.quadrate:
+            if quadrat[0] > x1:
+                x1 = quadrat[0]
+            if quadrat[1] > y1:
+                y1 = quadrat[1]
+        for quadrat in romino.quadrate:
+            if quadrat[0] > x2:
+                x2 = quadrat[0]
+            if quadrat[1] > y2:
+                y2 = quadrat[1]
+        
+        if x1 == x2 and y1 == y2 and x1 == y1:
+            achsen_tauschen_bools = [False, True]
+        elif x1 == x2 and y1 == y2:
+            achsen_tauschen_bools = [False]
+        elif x1 == y2 and y1 == x2:
+            achsen_tauschen_bools = [True]
+        else:
+            return False
+
+        for achsen_tauschen_bool in achsen_tauschen_bools:
             if achsen_tauschen_bool:
-                if (True, 0) in self.deckungsgleiche:
-                    achsen_getauscht = self.deckungsgleiche[(True, 0)]
-                else:
-                    achsen_getauscht = self.achsen_tauschen(self.quadrate)
-                    self.deckungsgleiche[(True, 0)] = achsen_getauscht
+                quadrate = self.achsen_tauschen(self.quadrate)
             else:
-                achsen_getauscht = self.quadrate
-            if romino.quadrate == achsen_getauscht:
+                quadrate = self.quadrate
+
+            if quadrate == romino.quadrate:
                 return True
 
-            if (achsen_tauschen_bool, 1) in self.deckungsgleiche:
-                gespiegelt = self.deckungsgleiche[(achsen_tauschen_bool, 1)]
-            else:
-                gespiegelt = self.spiegeln(achsen_getauscht, 0)
-                self.deckungsgleiche[(achsen_tauschen_bool, 1)] = gespiegelt
-            if romino.quadrate == gespiegelt:
-                return True
-
-            if (achsen_tauschen_bool, 2) in self.deckungsgleiche:
-                gespiegelt = self.deckungsgleiche[(achsen_tauschen_bool, 2)]
-            else:
-                gespiegelt = self.spiegeln(gespiegelt, 1)
-                self.deckungsgleiche[(achsen_tauschen_bool, 2)] = gespiegelt
-            if romino.quadrate == gespiegelt:
-                return True
-
-            if (achsen_tauschen_bool, 3) in self.deckungsgleiche:
-                gespiegelt = self.deckungsgleiche[(achsen_tauschen_bool, 3)]
-            else:
-                gespiegelt = self.spiegeln(achsen_getauscht, 1)
-                self.deckungsgleiche[(achsen_tauschen_bool, 3)] = gespiegelt
-            if romino.quadrate == gespiegelt:
-                return True
+            for spiegelachse in [0, 1, 0]:
+                quadrate = self.spiegeln(quadrate, spiegelachse)
+                if quadrate == romino.quadrate:
+                    return True
         return False
 
     def render(self, draw, x, y):
