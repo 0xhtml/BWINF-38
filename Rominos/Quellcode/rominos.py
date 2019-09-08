@@ -150,17 +150,27 @@ class Romino:
 
         for achsen_tauschen_bool in achsen_tauschen_bools:
             if achsen_tauschen_bool:
-                quadrate = self.achsen_tauschen(self.quadrate)
+                if (True, 0) in self.deckungsgleiche:
+                    quadrate = self.deckungsgleiche[(True, 0)]
+                else:
+                    quadrate = self.achsen_tauschen(self.quadrate)
+                    self.deckungsgleiche[(True, 0)] = quadrate
             else:
                 quadrate = self.quadrate
 
             if quadrate == romino.quadrate:
                 return True
 
+            i = 1
             for spiegelachse in [0, 1, 0]:
-                quadrate = self.spiegeln(quadrate, spiegelachse)
+                if (achsen_tauschen_bool, i) in self.deckungsgleiche:
+                    quadrate = self.deckungsgleiche[(achsen_tauschen_bool, i)]
+                else:
+                    quadrate = self.spiegeln(quadrate, spiegelachse)
+                    self.deckungsgleiche[(achsen_tauschen_bool, i)] = quadrate
                 if quadrate == romino.quadrate:
                     return True
+                i += 1
         return False
 
     def render(self, draw, x, y):
