@@ -23,7 +23,7 @@ class Romino:
         self.deckungsgleiche = {}
 
         self.nachbar_positionen = {(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1),
-            (1, -1), (1, 0), (1, 1)}
+                                   (1, -1), (1, 0), (1, 1)}
 
     def verschieben(self):
         """
@@ -69,7 +69,8 @@ class Romino:
         def verbunden(position, gefunden):
             for xo, yo in self.nachbar_positionen:
                 neue_position = (position[0] + xo, position[1] + yo)
-                if neue_position in self.quadrate and neue_position not in gefunden:
+                if neue_position in self.quadrate \
+                        and neue_position not in gefunden:
                     gefunden.add(neue_position)
                     verbunden(neue_position, gefunden)
             return len(gefunden)
@@ -138,7 +139,7 @@ class Romino:
                 x2 = quadrat[0]
             if quadrat[1] > y2:
                 y2 = quadrat[1]
-        
+
         if x1 == x2 and y1 == y2 and x1 == y1:
             achsen_tauschen_bools = [False, True]
         elif x1 == x2 and y1 == y2:
