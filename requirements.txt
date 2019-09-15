@@ -1,2 +1,1 @@
 pillow
-python-language-server[all]
