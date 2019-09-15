@@ -6,6 +6,52 @@ import PIL.ImageDraw
 import time
 
 
+def gültig(quadrate):
+    """
+    Diese Funktion testet, ob es sich um eine gültige Kombination von
+    Quadraten handelt.
+
+    Für eine gültige Kombination müssen alle Quadrate verbunden sein und sich
+    mindestens einmal zwei Quadrate nur mit der Ecke (also diagonal) berühren.
+    """
+    # Teste ob alle Quadrate mit einander verbunden sind
+    erstes_quadrat = quadrate.__iter__().__next__()
+    gefunden = set()
+    nächste = {erstes_quadrat}
+
+    while len(nächste) > 0:
+        nachbarn = set()
+        for quadrat in nächste:
+            for xo, yo in {(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)}:
+                position = (quadrat[0] + xo, quadrat[1] + yo)
+                if position in quadrate and position not in gefunden:
+                    nachbarn.add(position)
+        gefunden.update(nächste)
+        nächste = nachbarn
+
+    if len(gefunden) != len(quadrate):
+        return False
+
+    # Teste ob mindestens eine diagonale Verbindung vorhanden ist:
+    # Gehe durch alle Quadrate
+    for (x, y) in quadrate:
+        # Alle diagonalen Positionen
+        o = {(-1, -1), (-1, 1), (1, -1), (1, 1)}
+
+        # Gehe durch alle diagonalen Positionen
+        for xo, yo in o:
+            # Teste ob die diagonale Vorhanden ist und keine gerade
+            # Verbindung vorhanden ist
+            if (x + xo, y + yo) in quadrate and \
+                (x + xo, y) not in quadrate and \
+                    (x, y + yo) not in quadrate:
+                # Es ist eine diagonale Verbindung vorhanden
+                return True
+
+    # Es ist keine diagonale Verbindung vorhanden
+    return False
+
+
 class Romino:
     """Ein einzelner Romino bestehend aus n Quadraten"""
 
@@ -21,9 +67,6 @@ class Romino:
 
         # Erstelle Dict für desckungsgleiche Rominos
         self.deckungsgleiche = {}
-
-        self.nachbar_positionen = {(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1),
-                                   (1, -1), (1, 0), (1, 1)}
 
     def verschieben(self):
         """
@@ -53,56 +96,9 @@ class Romino:
                     y = quadrat[1]
 
             # Verschiebe die Quadrate
-            funktion = lambda q: (q[0] - x, q[1] - y)
+            def funktion(q): return (q[0] - x, q[1] - y)
             self.quadrate = set(map(funktion, self.quadrate))
             self.verschoben = True
-
-    def gültig(self):
-        """
-        Diese Funktion testet, ob es sich um eine gültige Kombination von
-        Quadraten handelt.
-
-        Für eine gültige Kombination müssen sich mindestens einmal zwei Quadrate
-        nur mit der Ecke (also diagonal) berühren.
-        """
-        # Teste ob alle Quadrate mit einander verbunden sind
-        def verbunden(position, gefunden):
-            for xo, yo in self.nachbar_positionen:
-                neue_position = (position[0] + xo, position[1] + yo)
-                if neue_position in self.quadrate \
-                        and neue_position not in gefunden:
-                    gefunden.add(neue_position)
-                    verbunden(neue_position, gefunden)
-            return len(gefunden)
-
-        # Suche nach allen verbundenen Quadraten
-        erstes_quadrat = self.quadrate.__iter__().__next__()
-        verbundene_quadrate = verbunden(erstes_quadrat, {erstes_quadrat})
-
-        # Teste ob alle Quadrate gefunden wurden
-        if verbundene_quadrate != self.größe:
-            # Es wurden nicht alle Quadrate gefunde. Das heißt, dass nicht
-            # alle Quadrate verbuden sind.
-            return False
-
-        # Teste ob mindestens eine diagonale Verbindung vorhanden ist:
-        # Gehe durch alle Quadrate
-        for (x, y) in self.quadrate:
-            # Alle diagonalen Positionen
-            o = {(-1, -1), (-1, 1), (1, -1), (1, 1)}
-
-            # Gehe durch alle diagonalen Positionen
-            for xo, yo in o:
-                # Teste ob die diagonale Vorhanden ist und keine gerade
-                # Verbindung vorhanden ist
-                if (x + xo, y + yo) in self.quadrate and \
-                    (x + xo, y) not in self.quadrate and \
-                        (x, y + yo) not in self.quadrate:
-                    # Es ist eine diagonale Verbindung vorhanden
-                    return True
-
-        # Es ist keine diagonale Verbindung vorhanden
-        return False
 
     def spiegeln(self, quadrate, achse):
         max = 0
@@ -110,7 +106,7 @@ class Romino:
             if quadrat[achse] > max:
                 max = quadrat[achse]
 
-        funktion = lambda q: q[:achse] + (max - q[achse],) + q[achse + 1:]
+        def funktion(q): return q[:achse] + (max - q[achse],) + q[achse + 1:]
         return set(map(funktion, quadrate))
 
     def achsen_tauschen(self, quadrate):
@@ -205,27 +201,21 @@ if __name__ == "__main__":
         exit()
 
     # Generiere alle möglichen Quadrat positionen
-    mögliche_quadrate = set()
-    for x in range(n):
-        for y in range(n):
-            mögliche_quadrate.add((x, y))
+    mögliche_quadrate = itertools.product(range(n), range(n))
 
     # Generiere alle möglichen Rominos
     mögliche_rominos = itertools.combinations(mögliche_quadrate, n)
 
     # Teste alle möglichen Rominos auf Gültigkeit
+    mögliche_rominos = filter(gültig, mögliche_rominos)
+    mögliche_rominos = map(Romino, mögliche_rominos)
     gültige_rominos = set()
-    for romino_quadrate in mögliche_rominos:
-        # Erstelle Romino
-        romino = Romino(set(romino_quadrate))
-
-        # Teste Gültigkeit des Romino
-        if romino.gültig():
-            for romino2 in gültige_rominos:
-                if romino.deckungsgleich(romino2):
-                    break
-            else:
-                gültige_rominos.add(romino)
+    for romino in mögliche_rominos:
+        for romino2 in gültige_rominos:
+            if romino.deckungsgleich(romino2):
+                break
+        else:
+            gültige_rominos.add(romino)
 
     # Speichere Rominos ab
     größe = 1

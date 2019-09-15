@@ -1,1 +1,4 @@
 pillow
+autopep8
+pylint
+rope
