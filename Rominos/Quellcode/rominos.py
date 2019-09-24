@@ -62,43 +62,21 @@ class Romino:
         # Speichere ob dieser Romino bereits verschoben wurde
         self.verschoben = False
 
-        # Speichere die übergebenen Quadrate
-        self.quadrate = quadrate
+        # Ermittle die minimalen X- und Y-Position
+        x = self.größe
+        y = self.größe
+        for quadrat in quadrate:
+            if quadrat[0] < x:
+                x = quadrat[0]
+            if quadrat[1] < y:
+                y = quadrat[1]
+
+        # Verschiebe die Quadrate
+        def funktion(q): return (q[0] - x, q[1] - y)
+        self.quadrate = set(map(funktion, quadrate))
 
         # Erstelle Dict für desckungsgleiche Rominos
         self.deckungsgleiche = {}
-
-    def verschieben(self):
-        """
-        Diese Funktion verschiebt die Quadrate eines Rominos an die x- und
-        y-Achse.
-        +------>
-        |
-        |  XX
-        |   X
-        V
-        Aus dieser Anordnung z.B. wird die untere Anordnung. (Der Nullpunkt
-        beider Achsen befindet sich oben links.)
-        +------>
-        |XX
-        | X
-        |
-        V
-        """
-        if not self.verschoben:
-            # Ermittle die minimalen X- und Y-Position
-            x = self.größe
-            y = self.größe
-            for quadrat in self.quadrate:
-                if quadrat[0] < x:
-                    x = quadrat[0]
-                if quadrat[1] < y:
-                    y = quadrat[1]
-
-            # Verschiebe die Quadrate
-            def funktion(q): return (q[0] - x, q[1] - y)
-            self.quadrate = set(map(funktion, self.quadrate))
-            self.verschoben = True
 
     def spiegeln(self, quadrate, achse):
         max = 0
@@ -117,10 +95,6 @@ class Romino:
         Diese Funktion testet ob dieser und ein anderer Romino durch drehen,
         spiegeln und verschieben deckungsgleich sind.
         """
-        # Verschiebe die Rominos
-        self.verschieben()
-        romino.verschieben()
-
         x1 = 0
         y1 = 0
         x2 = 0
