@@ -4,6 +4,7 @@ import itertools
 import PIL.Image
 import PIL.ImageDraw
 import time
+from multiprocessing.dummy import Pool
 
 
 def gültig(quadrate):
@@ -182,7 +183,7 @@ if __name__ == "__main__":
 
     # Teste alle möglichen Rominos auf Gültigkeit
     mögliche_rominos = filter(gültig, mögliche_rominos)
-    mögliche_rominos = map(Romino, mögliche_rominos)
+    mögliche_rominos = Pool(4).map(Romino, mögliche_rominos)
     gültige_rominos = set()
     for romino in mögliche_rominos:
         for romino2 in gültige_rominos:
