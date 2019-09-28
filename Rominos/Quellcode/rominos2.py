@@ -22,9 +22,10 @@ def diagonal(romino):
 
 
 def nächste(romino_anfang):
-    nächste = [x for x in nachbarn(romino_anfang[-1])]
+    nächste = [y for x in romino_anfang for y in nachbarn(x)]
+    nächste = list(dict.fromkeys(nächste))
     def a(x): return x not in romino_anfang
-    def b(x): return diagonal(romino_anfang + [x])
+    def b(x): return romino_anfang + [x] == sorted(romino_anfang + [x])
     nächste = filter(lambda x: a(x) and b(x), nächste)
     return nächste
 
@@ -59,6 +60,7 @@ def gefunden(romino, rominos):
             gespiegelt = [(x[0], max_y - x[1]) for x in gespiegelt]
         if spiegelung[2]:
             gespiegelt = [x[::-1] for x in gespiegelt]
+        gespiegelt.sort()
         if gespiegelt in rominos:
             return True
     return False
@@ -75,14 +77,12 @@ if __name__ == "__main__":
     ausgabedatei = sys.argv[2]
 
     rominos = [[(x, y)] for x in range(n) for y in range(n)]
-    def a(x): return sum(x[0]) < n / 2 + 1
-    def b(x): return x[0][0] == 0 or x[0][1] == 0
-    rominos = filter(lambda x: a(x) and b(x), rominos)
+    rominos = filter(lambda x: x[0][0] == 0 or x[0][1] == 0, rominos)
 
     for _ in range(n - 1):
         rominos = [x + [y] for x in rominos for y in nächste(x)]
 
-    rominos = filter(an_null, rominos)
+    rominos = filter(lambda x: diagonal(x) and an_null(x), rominos)
 
     gefilterte_rominos = []
     for romino in rominos:
