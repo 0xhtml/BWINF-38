@@ -2,9 +2,9 @@ import sys
 import time
 
 
-def nachbarn(quadrat):
-    nachbarn = [(x, y) for x in range(-1, 2) for y in range(-1, 2)]
-    nachbarn = [(x + quadrat[0], y + quadrat[1]) for x, y in nachbarn]
+def nachbarn(q):
+    nachbarn = range(-1, 2)
+    nachbarn = [(x + q[0], y + q[1]) for x in nachbarn for y in nachbarn]
     def a(x): return x[0] >= 0 and x[1] >= 0
     def b(x): return x[0] < n and x[1] < n
     nachbarn = filter(lambda x: a(x) and b(x), nachbarn)
