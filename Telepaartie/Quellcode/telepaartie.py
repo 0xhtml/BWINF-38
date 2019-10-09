@@ -22,8 +22,6 @@ def telepaartiere(verteilung, a, b):
 
 
 def run(verteilung, tiefe):
-    if 0 in verteilung:
-        return [verteilung]
     if tiefe == 0:
         return False
 
@@ -33,6 +31,8 @@ def run(verteilung, tiefe):
 
     for telepaartie in telepaartien:
         telepaartierte_verteilung = telepaartiere(verteilung[:], *telepaartie)
+        if 0 in telepaartierte_verteilung:
+            return [telepaartie]
         res = run(telepaartierte_verteilung, tiefe - 1)
         if res != False and (bester == False or len(res) < len(bester)):
             bester = [telepaartie] + res
@@ -60,10 +60,10 @@ if __name__ == "__main__":
         bester = []
         for verteilung in verteilungen:
             telepaartieschritte = run(verteilung, n)
-            if len(telepaartieschritte) - 1 > len(bester) - 2:
-                bester = telepaartieschritte + [verteilung]
+            if len(telepaartieschritte) > len(bester):
+                bester = telepaartieschritte
 
-        print(len(bester) - 2)
+        print(len(bester))
     else:
         b1 = int(sys.argv[1])
         b2 = int(sys.argv[2])
@@ -71,7 +71,7 @@ if __name__ == "__main__":
         verteilung = [b1, b2, b3]
 
         telepaartieschritte = run(verteilung, 50)
-        for telepaartie in telepaartieschritte[:-1]:
+        for telepaartie in telepaartieschritte:
             a = str(verteilung)
             verteilung = telepaartiere(verteilung, *telepaartie)
             c = str(verteilung)
@@ -85,4 +85,4 @@ if __name__ == "__main__":
             print(c)
             print()
 
-        print(len(telepaartieschritte) - 1, "Schritte")
+        print(len(telepaartieschritte), "Schritte")
