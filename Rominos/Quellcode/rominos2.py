@@ -1,13 +1,12 @@
 import sys
 import time
+import math
 
 
 def nachbarn(q):
-    nachbarn = range(-1, 2)
-    nachbarn = [(x + q[0], y + q[1]) for x in nachbarn for y in nachbarn]
-    def a(x): return x[0] >= 0 and x[1] >= 0
-    def b(x): return x[0] < n and x[1] < n
-    nachbarn = filter(lambda x: a(x) and b(x), nachbarn)
+    nachbarn = {-1, 0, 1}
+    nachbarn = {(x + q[0], y + q[1]) for x in nachbarn for y in nachbarn}
+    nachbarn = filter(lambda x: x[0] >= 0 and x[1] >= 0, nachbarn)
     return nachbarn
 
 
@@ -22,8 +21,7 @@ def diagonal(romino):
 
 
 def nächste(romino_anfang):
-    nächste = [y for x in romino_anfang for y in nachbarn(x)]
-    nächste = list(dict.fromkeys(nächste))
+    nächste = {y for x in romino_anfang for y in nachbarn(x)}
     def a(x): return x not in romino_anfang
     def b(x): return romino_anfang + [x] == sorted(romino_anfang + [x])
     nächste = filter(lambda x: a(x) and b(x), nächste)
@@ -76,8 +74,7 @@ if __name__ == "__main__":
     n = int(sys.argv[1])
     ausgabedatei = sys.argv[2]
 
-    rominos = [[(x, y)] for x in range(n) for y in range(n)]
-    rominos = filter(lambda x: x[0][0] == 0 or x[0][1] == 0, rominos)
+    rominos = [[(0, y)] for y in range(math.floor(n / 2))]
 
     for _ in range(n - 1):
         rominos = [x + [y] for x in rominos for y in nächste(x)]
@@ -89,7 +86,6 @@ if __name__ == "__main__":
         if not gefunden(romino, gefilterte_rominos):
             gefilterte_rominos.append(romino)
 
-    print(gefilterte_rominos[:5])
     print(len(gefilterte_rominos))
 
     print("%.0f" % ((time.time() - start_zeit) * 1000), "ms")
