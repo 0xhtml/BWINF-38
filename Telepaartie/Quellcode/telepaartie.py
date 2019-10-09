@@ -1,7 +1,5 @@
+import sys
 import time
-import math
-
-count = 0
 
 
 def mögliche_telepaartien(verteilung):
@@ -24,8 +22,6 @@ def telepaartiere(verteilung, a, b):
 
 
 def run(verteilung, tiefe):
-    global count
-    count += 1
     if 0 in verteilung:
         return [verteilung]
     if tiefe == 0:
@@ -33,27 +29,60 @@ def run(verteilung, tiefe):
 
     telepaartien = mögliche_telepaartien(verteilung)
 
-    best = False
-    bestlen = math.inf
+    bester = False
 
     for telepaartie in telepaartien:
         telepaartierte_verteilung = telepaartiere(verteilung[:], *telepaartie)
         res = run(telepaartierte_verteilung, tiefe - 1)
-        if res != False and len(res) < bestlen:
-            best = [telepaartie] + res
-            bestlen = len(res)
+        if res != False and (bester == False or len(res) < len(bester)):
+            bester = [telepaartie] + res
             tiefe = len(res)
 
-    return best
+    return bester
 
 
 if __name__ == "__main__":
     startzeit = time.time()
 
-    verteilung = [2, 4, 9]
-    res = run(verteilung, 100)
+    if len(sys.argv) != 2 and len(sys.argv) != 4:
+        print("Benutzung:", sys.argv[0], "n")
+        print("      oder", sys.argv[0], "behälter1 behälter2 behälter3")
+        exit()
 
-    if res != False:
-        print(res)
-    print(count)
-    print("%.0f" % ((time.time() - startzeit) * 1000), "ms")
+    if len(sys.argv) == 2:
+        n = int(sys.argv[1])
+
+        verteilungen = []
+        for a in range(1, n):
+            for b in range(1, n - a):
+                verteilungen.append([a, b, n - a - b])
+
+        bester = []
+        for verteilung in verteilungen:
+            telepaartieschritte = run(verteilung, n)
+            if len(telepaartieschritte) - 1 > len(bester) - 2:
+                bester = telepaartieschritte + [verteilung]
+
+        print(len(bester) - 2)
+    else:
+        b1 = int(sys.argv[1])
+        b2 = int(sys.argv[2])
+        b3 = int(sys.argv[3])
+        verteilung = [b1, b2, b3]
+
+        telepaartieschritte = run(verteilung, 50)
+        for telepaartie in telepaartieschritte[:-1]:
+            a = str(verteilung)
+            verteilung = telepaartiere(verteilung, *telepaartie)
+            c = str(verteilung)
+
+            b = "  " + str(telepaartie[0] + 1) + " <"
+            b += "-" * (len(a) - len(b) * 2)
+            b += "> " + str(telepaartie[1] + 1)
+
+            print(a)
+            print(b)
+            print(c)
+            print()
+
+        print(len(telepaartieschritte) - 1, "Schritte")
