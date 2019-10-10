@@ -3,40 +3,27 @@ import time
 import math
 
 
-def nachbarn(q):
-    nachbarn = {-1, 0, 1}
+def nachbarn(q, nachbarn):
     nachbarn = {(x + q[0], y + q[1]) for x in nachbarn for y in nachbarn}
     nachbarn = filter(lambda x: x[0] >= 0 and x[1] >= 0, nachbarn)
     return nachbarn
 
 
-def diagonale_nachbarn(q):
-    nachbarn = {-1, 1}
-    nachbarn = {(x + q[0], y + q[1]) for x in nachbarn for y in nachbarn}
-    nachbarn = filter(lambda x: x[0] >= 0 and x[1] >= 0, nachbarn)
-    return nachbarn
-
-
-def nächste(romino_anfang):
+def nächste(romino_anfang, n):
     if len(romino_anfang) == 1:
-        nächste = {y for x in romino_anfang for y in diagonale_nachbarn(x)}
+        nächste = {y for x in romino_anfang for y in nachbarn(x, {-1, 1})}
     else:
-        nächste = {y for x in romino_anfang for y in nachbarn(x)}
+        nächste = {y for x in romino_anfang for y in nachbarn(x, {-1, 0, 1})}
         nächste.remove((romino_anfang[0][0], romino_anfang[1][1]))
         nächste.remove((romino_anfang[1][0], romino_anfang[0][1]))
+
+    if len(romino_anfang) == n - 1:
+        null = set(filter(lambda x: x[1] == 0, romino_anfang))
+        if len(null) == 0:
+            nächste = filter(lambda x: x[1] == 0, nächste)
+
     nächste = filter(lambda x: x not in romino_anfang, nächste)
     return nächste
-
-
-def an_null(romino):
-    x = False
-    y = False
-    for quadrat in romino:
-        if quadrat[0] == 0:
-            x = True
-        if quadrat[1] == 0:
-            y = True
-    return x and y
 
 
 def gefunden(romino, rominos):
@@ -77,10 +64,9 @@ if __name__ == "__main__":
     rominos = [[(0, y)] for y in range(math.floor(n / 2))]
 
     for _ in range(n - 1):
-        rominos = [x + [y] for x in rominos for y in nächste(x)]
+        rominos = [x + [y] for x in rominos for y in nächste(x, n)]
 
     rominos = {tuple(sorted(x)) for x in rominos}
-    rominos = filter(an_null, rominos)
 
     gefilterte_rominos = []
     for romino in rominos:
