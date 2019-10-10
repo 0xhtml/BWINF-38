@@ -10,21 +10,21 @@ def nachbarn(q):
     return nachbarn
 
 
-def diagonal(romino):
-    for quadrat in romino:
-        for x, y in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
-            if (quadrat[0] + x, quadrat[1] + y) in romino and \
-                (quadrat[0], quadrat[1] + y) not in romino and \
-                    (quadrat[0] + x, quadrat[1]) not in romino:
-                return True
-    return False
+def diagonale_nachbarn(q):
+    nachbarn = {-1, 1}
+    nachbarn = {(x + q[0], y + q[1]) for x in nachbarn for y in nachbarn}
+    nachbarn = filter(lambda x: x[0] >= 0 and x[1] >= 0, nachbarn)
+    return nachbarn
 
 
 def nächste(romino_anfang):
-    nächste = {y for x in romino_anfang for y in nachbarn(x)}
-    def a(x): return x not in romino_anfang
-    def b(x): return romino_anfang + [x] == sorted(romino_anfang + [x])
-    nächste = filter(lambda x: a(x) and b(x), nächste)
+    if len(romino_anfang) == 1:
+        nächste = {y for x in romino_anfang for y in diagonale_nachbarn(x)}
+    else:
+        nächste = {y for x in romino_anfang for y in nachbarn(x)}
+        nächste.remove((romino_anfang[0][0], romino_anfang[1][1]))
+        nächste.remove((romino_anfang[1][0], romino_anfang[0][1]))
+    nächste = filter(lambda x: x not in romino_anfang, nächste)
     return nächste
 
 
@@ -58,7 +58,7 @@ def gefunden(romino, rominos):
             gespiegelt = [(x[0], max_y - x[1]) for x in gespiegelt]
         if spiegelung[2]:
             gespiegelt = [x[::-1] for x in gespiegelt]
-        gespiegelt.sort()
+        gespiegelt = tuple(sorted(gespiegelt))
         if gespiegelt in rominos:
             return True
     return False
@@ -79,7 +79,8 @@ if __name__ == "__main__":
     for _ in range(n - 1):
         rominos = [x + [y] for x in rominos for y in nächste(x)]
 
-    rominos = filter(lambda x: diagonal(x) and an_null(x), rominos)
+    rominos = {tuple(sorted(x)) for x in rominos}
+    rominos = filter(an_null, rominos)
 
     gefilterte_rominos = []
     for romino in rominos:
