@@ -52,14 +52,15 @@ def gefunden(romino, rominos):
 
 
 if __name__ == "__main__":
-    start_zeit = time.time()
-
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 3 and len(sys.argv) != 2:
         print("Nutzung:", sys.argv[0], "n ausgabedatei")
+        print("   oder:", sys.argv[0], "n")
         exit()
 
     n = int(sys.argv[1])
-    ausgabedatei = sys.argv[2]
+    datei = sys.argv[2] if len(sys.argv) == 3 else None
+
+    print(f"Starte berechnung für n={n}")
 
     rominos = [[(0, y)] for y in range(math.floor(n / 2))]
 
@@ -73,6 +74,20 @@ if __name__ == "__main__":
         if not gefunden(romino, gefilterte_rominos):
             gefilterte_rominos.append(romino)
 
-    print(len(gefilterte_rominos))
-
-    print("%.0f" % ((time.time() - start_zeit) * 1000), "ms")
+    print(f"Es wurden {len(gefilterte_rominos)} Rominos gefunden.")
+    if datei != None:
+        datei = datei.split(".")
+        datei = ".".join(datei[:-1]) if len(datei) > 1 else datei[0]
+        print(f"Speichere Rominos in {datei}.txt ab.")
+        datei = open(datei + ".txt", "w")
+        datei.write(f"{len(gefilterte_rominos)} Rominos der Größe n={n}\n\n")
+        for romino in gefilterte_rominos:
+            for x in range(n):
+                for y in range(n):
+                    if (x, y) in romino:
+                        datei.write("█")
+                    else:
+                        datei.write("░")
+                datei.write("\n")
+            datei.write("\n")
+        datei.close()
