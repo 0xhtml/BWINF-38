@@ -1,0 +1,8 @@
+[MESSAGES CONTROL]
+disable=missing-module-docstring,redefined-outer-name
+[BASIC]
+good-names=i, x, y
+argument-rgx=(([a-zäöüß_][a-zäöüß0-9_]{2,})|(_[a-zäöüß0-9_]*)|(__[a-zäöüß][a-zäöüß0-9_]+__))$
+function-rgx=(([a-zäöüß_][a-zäöüß0-9_]{2,})|(_[a-zäöüß0-9_]*)|(__[a-zäöüß][a-zäöüß0-9_]+__))$
+variable-rgx=(([a-zäöüß_][a-zäöüß0-9_]{2,})|(_[a-zäöüß0-9_]*)|(__[a-zäöüß][a-zäöüß0-9_]+__))$
+const-rgx=(([a-zäöüß_][a-zäöüß0-9_]{2,})|(_[a-zäöüß0-9_]*)|(__[a-zäöüß][a-zäöüß0-9_]+__))$
