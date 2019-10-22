@@ -49,7 +49,7 @@ def nächste(romino, größe):
 
         # Teste, ob für keine Quadrate y=0 gilt
         if len(null) == 0:
-            # Wenn für keine Quadrate y=0 gilt, muss im beim letzten ma
+            # Wenn für keine Quadrate y=0 gilt, muss im beim letzten mal
             # Generieren der Quadrate y=0 gelten
             # Filtere alle Quadrate raus, bei denen nicht y=0 gilt
             nächste = filter(lambda x: x[1] == 0, nächste)
@@ -88,37 +88,72 @@ def gefunden(romino, rominos):
 
 
 if __name__ == "__main__":
+    # Teste ob alle Argumente angegeben wurden
     if len(sys.argv) != 3 and len(sys.argv) != 2:
+        # Wenn nicht alle Argumente angegeben wurden, zeige Informationen zu den
+        # Argumenten
         print("Nutzung:", sys.argv[0], "n ausgabedatei")
         print("   oder:", sys.argv[0], "n")
+
+        # Beende das Programm
         sys.exit()
 
+    # Lese die Größe und evt. die Ausgabedatei ein
     größe = int(sys.argv[1])
     datei = sys.argv[2] if len(sys.argv) == 3 else None
 
     print(f"Starte berechnung für n={größe}")
 
+    # Generiere die ersten Quadrate des Rominos
+    # Es werden zuerst nur die Quadrate an folgenden Positionen generiert:
+    # Beispiel: Bei n=4
+    #   +---> y
+    #   |██░░
+    #   |░░░░
+    #   |░░░░
+    # x V░░░░
     rominos = [[(0, y)] for y in range(math.floor(größe / 2))]
 
+    # Generiere alle weiteren Quadrate
     for _ in range(größe - 1):
         rominos = [x + [y] for x in rominos for y in nächste(x, größe)]
 
+    # Bringe alle Quadrate der generierten Rominos in sortierte Reinfolge und
+    # konvertiere zu einem Set
     rominos = {tuple(sorted(x)) for x in rominos}
 
+    # Erstelle Set für die nach Deckungsgleichheit gefilterten Rominos
     gefilterte_rominos = set()
+
+    # Gehe durch alle Rominos
     for romino in rominos:
+        # Teste ob dieser Romino bereits in den gefilterten Rominos ist
         if not gefunden(romino, gefilterte_rominos):
+            # Wenn nicht, füge den Romino hinzu
             gefilterte_rominos.add(romino)
 
     print(f"Es wurden {len(gefilterte_rominos)} Rominos gefunden.")
+
+    # Teste ob eine Ausgabedatei angegeben wurde
     if datei is not None:
+        # Speichere die Rominos ab
+
+        # Entferne die Dateiendung
         datei = datei.split(".")
         datei = ".".join(datei[:-1]) if len(datei) > 1 else datei[0]
+
         print(f"Speichere Rominos in {datei}.txt ab.")
+
+        # Öffne die Ausgabedatei zum schreiben
         datei = open(datei + ".txt", "w")
+
+        # Schreibe die Anzahl und Größe der Rominos in die erste Zeile
         datei.write(
             f"{len(gefilterte_rominos)} Rominos der Größe n={größe}\n\n")
+
+        # Iteriere durch alle gefilterten Rominos
         for romino in gefilterte_rominos:
+            # Schreibe den Romino in die Ausgabedatei
             for x in range(größe):
                 for y in range(größe):
                     if (x, y) in romino:
@@ -127,4 +162,6 @@ if __name__ == "__main__":
                         datei.write("░")
                 datei.write("\n")
             datei.write("\n")
+
+        # Schließe die Ausgabedatei
         datei.close()
