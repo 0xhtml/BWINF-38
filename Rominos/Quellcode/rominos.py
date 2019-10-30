@@ -61,29 +61,54 @@ def nächste(romino, größe):
     return nächste
 
 
+def achsen_tauschen(romino):
+    """Diese Funktion tauscht die x- und y-Achse eines Rominos"""
+    return [x[::-1] for x in romino]
+
+
+def spiegeln(romino, achse):
+    """Diese Funktion spiegelt einen Romino auf einer Achse"""
+
+    # Finde maximale Position auf der zu spiegelden Achse
+    maximal = 0
+    for quadrat in romino:
+        if quadrat[achse] > maximal:
+            maximal = quadrat[achse]
+
+    # Spiegel den Romino
+    if achse == 0:
+        return [(maximal - x[0], x[1]) for x in romino]
+    else:
+        return [(x[0], maximal - x[1]) for x in romino]
+
+
 def gefunden(romino, rominos):
     """Diese Funktion testet, ob ein romino bereits gefunden wurde"""
-    spiegelungen = [(x, y, z) for x in range(2)
-                    for y in range(2) for z in range(2)]
-    for spiegelung in spiegelungen:
-        gespiegelt = romino
-        if spiegelung[0]:
-            max_x = 0
-            for quadrat in romino:
-                if quadrat[0] > max_x:
-                    max_x = quadrat[0]
-            gespiegelt = [(max_x - x[0], x[1]) for x in gespiegelt]
-        if spiegelung[1]:
-            max_y = 0
-            for quadrat in romino:
-                if quadrat[1] > max_y:
-                    max_y = quadrat[1]
-            gespiegelt = [(x[0], max_y - x[1]) for x in gespiegelt]
-        if spiegelung[2]:
-            gespiegelt = [x[::-1] for x in gespiegelt]
-        gespiegelt = tuple(sorted(gespiegelt))
-        if gespiegelt in rominos:
+
+    # Definiere alle nötigen Schritte zum testen der Deckungsgleichheit
+    schritte = [
+        (spiegeln, 0),
+        (spiegeln, 1),
+        (spiegeln, 0),
+        (achsen_tauschen, ),
+        (spiegeln, 0),
+        (spiegeln, 1),
+        (spiegeln, 0)
+    ]
+
+    # Gehe durch alle Schritte
+    for schritt in schritte:
+        # Führe Schritt aus
+        romino = schritt[0](romino, *schritt[1:])
+
+        # Sortiere Romino
+        romino = tuple(sorted(romino))
+
+        # Teste ob Romino bereits gefunden wurde
+        if romino in rominos:
             return True
+
+    # Romino wurde noch nicht gefunden
     return False
 
 
