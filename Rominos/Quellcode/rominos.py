@@ -82,10 +82,13 @@ def spiegeln(romino, achse):
         return [(x[0], maximal - x[1]) for x in romino]
 
 
-def gefunden(romino, rominos):
-    """Diese Funktion testet, ob ein romino bereits gefunden wurde"""
+def deckungsgleiche(romino):
+    """Diese Funktion generiert alle Deckungsgleiche eines Romino"""
 
-    # Definiere alle nötigen Schritte zum testen der Deckungsgleichheit
+    # Liste für allen Deckunkgsgleichen
+    deckungsgleiche = set()
+
+    # Definiere alle nötigen Schritte zum generieren der Deckungsgleichen
     schritte = [
         (spiegeln, 0),
         (spiegeln, 1),
@@ -104,12 +107,11 @@ def gefunden(romino, rominos):
         # Sortiere Romino
         romino = tuple(sorted(romino))
 
-        # Teste ob Romino bereits gefunden wurde
-        if romino in rominos:
-            return True
+        # Füge Romino hinzu
+        deckungsgleiche.add(romino)
 
-    # Romino wurde noch nicht gefunden
-    return False
+    # Gebe Deckungsgleiche zurück
+    return deckungsgleiche
 
 
 if __name__ == "__main__":
@@ -150,12 +152,18 @@ if __name__ == "__main__":
     # Erstelle Set für die nach Deckungsgleichheit gefilterten Rominos
     gefilterte_rominos = set()
 
+    # Erstelle Set für die deckungsgleichen Rominos der gefilterten Rominos
+    deckungsgleiche_rominos = set()
+
     # Gehe durch alle Rominos
     for romino in rominos:
-        # Teste ob dieser Romino bereits in den gefilterten Rominos ist
-        if not gefunden(romino, gefilterte_rominos):
-            # Wenn nicht, füge den Romino hinzu
-            gefilterte_rominos.add(romino)
+        # Teste ob Romino schon gefunden wurde
+        if romino in deckungsgleiche_rominos:
+            continue
+
+        # Füge Romino und Deckungsgleiche des Rominos hinzu
+        deckungsgleiche_rominos.update(deckungsgleiche(romino))
+        gefilterte_rominos.add(romino)
 
     print(f"Es wurden {len(gefilterte_rominos)} Rominos gefunden.")
 
