@@ -26,21 +26,21 @@ def nachbarn(quadrat, gerade=True):
     return nachbarn
 
 
-def nächste(romino, größe):
+def nächste(romino, größe, auf_halbe_größe):
     """Diese Funktion generiert die nächsten Quadrate für einen Romino"""
 
     # Teste, ob dies das erstemal Generieren der Quadrate ist
     if len(romino) == 1:
         # Generiere nur diagonale Nachbarn
-        nächste = {y for x in romino for y in nachbarn(x, False)}
+        nächste = {y for x in romino[-auf_halbe_größe:] for y in nachbarn(x, 0)}
     else:
         # Generiere diagonale un gerade Nachbarn
-        nächste = {y for x in romino for y in nachbarn(x)}
+        nächste = {y for x in romino[-auf_halbe_größe:] for y in nachbarn(x)}
 
         # Entferne gerade Nachbarn neben der ersten diagonalen Verbindung, damit
         # diese erhalten bleibt
-        nächste.remove((romino[0][0], romino[1][1]))
-        nächste.remove((romino[1][0], romino[0][1]))
+        nächste.discard((romino[0][0], romino[1][1]))
+        nächste.discard((romino[1][0], romino[0][1]))
 
     # Teste, ob dies das letze mal Generieren der Quadrate ist
     if len(romino) == größe - 1:
@@ -127,6 +127,8 @@ if __name__ == "__main__":
 
     # Lese die Größe und evt. die Ausgabedatei ein
     größe = int(sys.argv[1])
+    ab_halbe_größe = math.floor(größe / 2)
+    auf_halbe_größe = math.ceil(größe / 2)
     datei = sys.argv[2] if len(sys.argv) == 3 else None
 
     print(f"Starte berechnung für n={größe}")
@@ -139,11 +141,11 @@ if __name__ == "__main__":
     #   |░░░░
     #   |░░░░
     # x V░░░░
-    rominos = [[(0, y)] for y in range(math.floor(größe / 2))]
+    rominos = [[(0, y)] for y in range(ab_halbe_größe)]
 
     # Generiere alle weiteren Quadrate
     for _ in range(größe - 1):
-        rominos = [x + [y] for x in rominos for y in nächste(x, größe)]
+        rominos = [x + [y] for x in rominos for y in nächste(x, größe, auf_halbe_größe)]
 
     # Bringe alle Quadrate der generierten Rominos in sortierte Reinfolge und
     # konvertiere zu einem Set
