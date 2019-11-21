@@ -44,11 +44,14 @@ def nächste(romino, größe, auf_halbe_größe):
 
     # Teste, ob dies das letze mal Generieren der Quadrate ist
     if len(romino) == größe - 1:
-        # Finde alle Quadrate, für die y=0 gilt
-        null = set(filter(lambda x: x[1] == 0, romino))
+        # Teste ob für mindestens ein Quadrate y=0 gilt
+        null = False
+        for quadrat in romino:
+            if quadrat[1] == 0:
+                null = True
+                break
 
-        # Teste, ob für keine Quadrate y=0 gilt
-        if len(null) == 0:
+        if not null:
             # Wenn für keine Quadrate y=0 gilt, muss im beim letzten mal
             # Generieren der Quadrate y=0 gelten
             # Filtere alle Quadrate raus, bei denen nicht y=0 gilt
