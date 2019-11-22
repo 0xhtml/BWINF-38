@@ -26,29 +26,32 @@ def nachbarn(quadrat, gerade=True):
     return nachbarn
 
 
-def nächste(romino, größe):
+def nächste(romino, größe, auf_halbe_größe):
     """Diese Funktion generiert die nächsten Quadrate für einen Romino"""
 
     # Teste, ob dies das erstemal Generieren der Quadrate ist
     if len(romino) == 1:
         # Generiere nur diagonale Nachbarn
-        nächste = {y for x in romino for y in nachbarn(x, False)}
+        nächste = {y for x in romino[-auf_halbe_größe:] for y in nachbarn(x, 0)}
     else:
         # Generiere diagonale un gerade Nachbarn
-        nächste = {y for x in romino for y in nachbarn(x)}
+        nächste = {y for x in romino[-auf_halbe_größe:] for y in nachbarn(x)}
 
         # Entferne gerade Nachbarn neben der ersten diagonalen Verbindung, damit
         # diese erhalten bleibt
-        nächste.remove((romino[0][0], romino[1][1]))
-        nächste.remove((romino[1][0], romino[0][1]))
+        nächste.discard((romino[0][0], romino[1][1]))
+        nächste.discard((romino[1][0], romino[0][1]))
 
     # Teste, ob dies das letze mal Generieren der Quadrate ist
     if len(romino) == größe - 1:
-        # Finde alle Quadrate, für die y=0 gilt
-        null = set(filter(lambda x: x[1] == 0, romino))
+        # Teste ob für mindestens ein Quadrate y=0 gilt
+        null = False
+        for quadrat in romino:
+            if quadrat[1] == 0:
+                null = True
+                break
 
-        # Teste, ob für keine Quadrate y=0 gilt
-        if len(null) == 0:
+        if not null:
             # Wenn für keine Quadrate y=0 gilt, muss im beim letzten mal
             # Generieren der Quadrate y=0 gelten
             # Filtere alle Quadrate raus, bei denen nicht y=0 gilt
@@ -82,10 +85,13 @@ def spiegeln(romino, achse):
         return [(x[0], maximal - x[1]) for x in romino]
 
 
-def gefunden(romino, rominos):
-    """Diese Funktion testet, ob ein romino bereits gefunden wurde"""
+def deckungsgleiche(romino):
+    """Diese Funktion generiert alle Deckungsgleiche eines Romino"""
 
-    # Definiere alle nötigen Schritte zum testen der Deckungsgleichheit
+    # Liste für allen Deckunkgsgleichen
+    deckungsgleiche = set()
+
+    # Definiere alle nötigen Schritte zum generieren der Deckungsgleichen
     schritte = [
         (spiegeln, 0),
         (spiegeln, 1),
@@ -104,12 +110,11 @@ def gefunden(romino, rominos):
         # Sortiere Romino
         romino = tuple(sorted(romino))
 
-        # Teste ob Romino bereits gefunden wurde
-        if romino in rominos:
-            return True
+        # Füge Romino hinzu
+        deckungsgleiche.add(romino)
 
-    # Romino wurde noch nicht gefunden
-    return False
+    # Gebe Deckungsgleiche zurück
+    return deckungsgleiche
 
 
 if __name__ == "__main__":
@@ -125,6 +130,8 @@ if __name__ == "__main__":
 
     # Lese die Größe und evt. die Ausgabedatei ein
     größe = int(sys.argv[1])
+    ab_halbe_größe = math.floor(größe / 2)
+    auf_halbe_größe = math.ceil(größe / 2)
     datei = sys.argv[2] if len(sys.argv) == 3 else None
 
     print(f"Starte berechnung für n={größe}")
@@ -137,11 +144,11 @@ if __name__ == "__main__":
     #   |░░░░
     #   |░░░░
     # x V░░░░
-    rominos = [[(0, y)] for y in range(math.floor(größe / 2))]
+    rominos = [[(0, y)] for y in range(ab_halbe_größe)]
 
     # Generiere alle weiteren Quadrate
     for _ in range(größe - 1):
-        rominos = [x + [y] for x in rominos for y in nächste(x, größe)]
+        rominos = [x + [y] for x in rominos for y in nächste(x, größe, auf_halbe_größe)]
 
     # Bringe alle Quadrate der generierten Rominos in sortierte Reinfolge und
     # konvertiere zu einem Set
@@ -150,12 +157,18 @@ if __name__ == "__main__":
     # Erstelle Set für die nach Deckungsgleichheit gefilterten Rominos
     gefilterte_rominos = set()
 
+    # Erstelle Set für die deckungsgleichen Rominos der gefilterten Rominos
+    deckungsgleiche_rominos = set()
+
     # Gehe durch alle Rominos
     for romino in rominos:
-        # Teste ob dieser Romino bereits in den gefilterten Rominos ist
-        if not gefunden(romino, gefilterte_rominos):
-            # Wenn nicht, füge den Romino hinzu
-            gefilterte_rominos.add(romino)
+        # Teste ob Romino schon gefunden wurde
+        if romino in deckungsgleiche_rominos:
+            continue
+
+        # Füge Romino und Deckungsgleiche des Rominos hinzu
+        deckungsgleiche_rominos.update(deckungsgleiche(romino))
+        gefilterte_rominos.add(romino)
 
     print(f"Es wurden {len(gefilterte_rominos)} Rominos gefunden.")
 
