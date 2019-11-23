@@ -1,0 +1,108 @@
+\documentclass[a4paper,10pt]{scrartcl}
+\usepackage{babel}
+
+\usepackage{scrlayer-scrpage}
+\lohead{Aufgabe 3: Telepaartie}
+\rohead{Team-ID: ***REMOVED***}
+\cfoot*{\thepage{}}
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{
+  keywordstyle=\color{blue},
+  commentstyle=\color{mygreen},
+  stringstyle=\color{mymauve},
+  rulecolor=\color{black},
+  basicstyle=\footnotesize\ttfamily,
+  numberstyle=\tiny\color{mygray},
+  numbers=left,
+  literate=%
+  {Ö}{{\"O}}1
+  {Ä}{{\"A}}1
+  {Ü}{{\"U}}1
+  {ß}{{\ss}}1
+  {ü}{{\"u}}1
+  {ä}{{\"a}}1
+  {ö}{{\"o}}1
+}
+
+\title{Aufgabe 3: Telepaartie}
+\author{Team-ID: ***REMOVED*** \\\\
+	    Team-Name: ***REMOVED*** \\\\
+	    Bearbeiter dieser Aufgabe: \\
+	    ***REMOVED***\\\\}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Lösungsidee}
+??
+
+\section{Umsetzung}
+??
+
+\section{Beispiele}
+Hier werde ich die Beispiele von der BWINF-Webseite und die Besispiele für aus der Aufgabe für die erweiterte Version aufführen.
+
+\subsection{Beispiel 1}
+Verteilung: (2, 4, 7)
+\begin{lstlisting}
+[2, 4, 7]
+  1 <> 3
+[4, 4, 5]
+
+[4, 4, 5]
+  1 <> 2
+[0, 8, 5]
+
+2 Schritte
+\end{lstlisting}
+
+\subsection{Beispiel 2}
+Verteilung: (3, 5, 7)
+\begin{lstlisting}
+[3, 5, 7]
+  1 <> 2
+[6, 2, 7]
+
+[6, 2, 7]
+  1 <> 2
+[4, 4, 7]
+
+[4, 4, 7]
+  1 <> 2
+[0, 8, 7]
+
+3 Schritte
+\end{lstlisting}
+
+\subsection{Beispiel 3}
+Verteilung: (80, 64, 32)
+\begin{lstlisting}
+[80, 64, 32]
+  1 <--> 3
+[48, 64, 64]
+
+[48, 64, 64]
+  2 <--> 3
+[48, 0, 128]
+
+2 Schritte
+\end{lstlisting}
+
+\subsection{Beispiel 4}
+L(10) = 2
+
+\subsection{Beispiel 5}
+L(100) = 7
+
+\section{Quellcode}
+\lstinputlisting[language=python]{"Aufgabe 3: Telepaartie/telepaartie.py"}
+
+\end{document}
