@@ -1,0 +1,121 @@
+\documentclass[a4paper,10pt]{scrartcl}
+\usepackage{babel}
+
+\usepackage{scrlayer-scrpage}
+\lohead{Aufgabe 2: Nummernmerker}
+\rohead{Team-ID: ***REMOVED***}
+\cfoot*{\thepage{}}
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{
+  keywordstyle=\color{blue},
+  commentstyle=\color{mygreen},
+  stringstyle=\color{mymauve},
+  rulecolor=\color{black},
+  basicstyle=\footnotesize\ttfamily,
+  numberstyle=\tiny\color{mygray},
+  numbers=left,
+  literate=%
+  {Ö}{{\"O}}1
+  {Ä}{{\"A}}1
+  {Ü}{{\"U}}1
+  {ß}{{\ss}}1
+  {ü}{{\"u}}1
+  {ä}{{\"a}}1
+  {ö}{{\"o}}1
+}
+
+\title{Aufgabe 2: Nummernmerker}
+\author{Team-ID: ***REMOVED*** \\\\
+	    Team-Name: ***REMOVED*** \\\\
+	    Bearbeiter dieser Aufgabe: \\
+	    ***REMOVED***\\\\}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Lösungsidee}
+Zur Lösung der Aufgabe sehe ich mir alle Möglichkeiten an, die Nummer in Blöcke zu unterteilen und wähle dann die Möglichkeit der Unterteilung in Blöcke aus, bei der am wenigsten Blöcke mit einer Null beginnen.
+
+Wenn es mehrere Unterteilungen gibt, bei der die wenigsten Blöcke mit einer Null beginnen, wähle ich die, die zusätzlich aus den wenigsten Blöcken besteht, aus.
+
+\section{Umsetzung}
+Ich habe die Lösungsidee in 3 Schritten implementiert:
+
+\begin{enumerate}
+	\item Suche nach allen Möglichkeiten der Unterteilung. In diesem Schritt werden jedoch nur die einzelnen Längen der Blöcke generiert.
+	\item Unterteile die Nummer in die zuvor generierten Blöcke.
+	\item Wähle die beste Unterteilung aus.
+\end{enumerate}
+
+\subsection{Schritt 1}
+Um alle Unterteilungsmöglichkeiten zu finden, generiere ich alle Kombinationen der möglichen Blocklängen (2, 3 u. 4). Jedoch ergeben sich auch Kombinationen, dessen Blöcke länger als die Nummer sind. Deshalb sortiere ich alle Kombinationen aus, bei denen die Summe der Blocklängen nicht der Länge der Nummer entspricht. Eine Kombination von Blocklängen sieht z.B. so aus: \lstinline|[2, 4, 3]|.
+
+\subsection{Schritt 2}
+Als nächstes nehme ich die Nummer und unterteile sie in die zuvor generierten Kombinationen von Blocklängen. Mit den Blocklängen \lstinline|[2, 4, 3]| und der Nummer \lstinline|123456789| sähe die Unterteilung so aus: \lstinline|[12, 3456, 789]|.
+
+\subsection{Schritt 3}
+Zuletzt wähle ich die Unterteilung, die die wenigsten Blöcke  mit Nullen am Anfang hat. Dazu gehe ich durch alle Unterteilungen, zähle die Anzahl der Blöcke, die mit einer Null beginnen, und wähle die kleinste Anzahl aus. Wenn ich mehrmals die kleinste Anzahl finde, wird die Unterteilung, die aus den wenigsten Blöcken besteht, gewählt.
+
+\section{Beispiele}
+Hier werde ich die Beispiele von der BWINF-Webseite aufführen.
+
+\subsection{Beispiel 1}
+Nummer: 005480000005179734 \\
+Ergebnis: 0054
+800
+0000
+517
+9734
+
+\subsection{Beispiel 2}
+Nummer: 03495929533790154412660 \\
+Ergebnis: 0349
+5929
+5337
+901
+5441
+2660
+
+\subsection{Beispiel 3}
+Nummer: 5319974879022725607620179 \\
+Ergebnis: 5319
+9748
+790
+2272
+560
+7620
+179
+
+\subsection{Beispiel 4}
+Nummer: 9088761051699482789038331267 \\
+Ergebnis: 9088
+7610
+5169
+9482
+7890
+3833
+1267
+
+\subsection{Beispiel 5}
+Nummer: 011000000011000100111111101011 \\
+Ergebnis: 011
+0000
+0001
+1000
+1001
+111
+1110
+1011
+
+\section{Quellcode}
+\lstinputlisting[language=python]{Nummernmerker/nummernmerker.py}
+
+\end{document}

@@ -37,8 +37,8 @@ def generiere_mögliche_blocklängen(nummer):
         block_längen = [[2, 3, 4] for _ in range(block_anzahl)]
         mögliche_blocklängen.update(itertools.product(*block_längen))
 
-    # Sortiere alle Längen aus, bei die summiert Länger oder Kürzer als die
-    # Nummer sind
+    # Sortiere alle Kombinationen von Längen aus, deren Blocklängensumme länger
+    # oder kürzer als die Numme ist
     mögliche_blocklängen = filter(lambda x: sum(
         x) == len(nummer), mögliche_blocklängen)
 
@@ -113,10 +113,10 @@ if __name__ == "__main__":
         print("Benutzung:", sys.argv[0], "nummer")
         sys.exit()
 
-    # Generiere alle möglichen kombinationen von Block längen
+    # Generiere alle möglichen Kombinationen von Blocklängen
     mögliche_blocklängen = generiere_mögliche_blocklängen(sys.argv[1])
 
-    # Generiere alle Blöcke mit den möglichen Block längen
+    # Generiere alle Blöcke mit den möglichen Blocklängen
     mögliche_blöcke = generiere_mögliche_blöcke(sys.argv[1], mögliche_blocklängen)
 
     # Finden die beste Möglichkeit für die Unterteilung in Blöcke
