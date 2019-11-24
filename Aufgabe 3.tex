@@ -18,7 +18,6 @@
   rulecolor=\color{black},
   basicstyle=\footnotesize\ttfamily,
   numberstyle=\tiny\color{mygray},
-  numbers=left,
   literate=%
   {Ö}{{\"O}}1
   {Ä}{{\"A}}1
@@ -42,10 +41,18 @@
 \tableofcontents
 
 \section{Lösungsidee}
-??
+Um die Aufgabe zu Lösen sehe ich mir für jede Verteilung von Biebern in den 3 Behältern alle möglichen Telepaartien an. Für die daraus resultierenden Verteilungen sehe ich mir wieder alle möglichen Telepaartien an, bis ich irgendwann eine Verteilung mit einem leeren Behälter erreiche. Die Anzahl der Telepaartien, mit denen ich am schnelsten einen Behälter leer hatte, ist die LLL der Ausgangsverteilung.
+
+Um L(n) zu finden sehe ich mir erst alle möglichen Verteilungen der n-Bieber auf die 3 Behälter an, finde dann je Verteilung die LLL und wähle die größte aus.
 
 \section{Umsetzung}
-??
+Um die suche nach LLL und L umzusetzten, arbeitet das Programm in zwei Modi jenachdem mit welchen Argumenten es aufgerufen wird. Wenn drei Nummern als Argumente angegeben werden, werden diese als die Bieber in den drei Behältern eingelesen. Wird nur eine Nummer als Argument angegeben, wird sie als n für die berechnung von L(n) eingelesen.
+
+\subsection{LLL}
+Im erstem Modi (berechnung von LLL) führe ich die rekursive Funktion \lstinline|run()| aus. Diese generiert als erstes alle möglichen Telepaartien, also alle Kombinationen von Behälter 1-3. Und führt dann jede Telepaartie aus. Wenn nach der Telepaartie noch kein Behälter leer ist, wird die Funktion rekursiv erneut aufgerufen, solange bis ein Behälter leer ist. Sobald ein Behälter leer ist wird die Anzahl der benötigten Telepaartien gespeichert und nur noch nach Möglichkeiten mit weniger Telepaartien gesucht. So ergibt sie die LLL der Verteilung.
+
+\subsection{L(n)}
+Im zweitem Modi (berechnung von L()) generiere ich zuerst alle möglichen Verteilung der n-Bieber. Und führe dann für jede Verteilung die \lstinline|run()| Funktion aus. Die größte LLL die durch die \lstinline|run()| Funktion gefunden wurde, ist dann L(n).
 
 \section{Beispiele}
 Hier werde ich die Beispiele von der BWINF-Webseite und die Besispiele für aus der Aufgabe für die erweiterte Version aufführen.
@@ -103,6 +110,7 @@ L(10) = 2
 L(100) = 7
 
 \section{Quellcode}
+\lstset{numbers=left}
 \lstinputlisting[language=python]{"Aufgabe 3: Telepaartie/telepaartie.py"}
 
 \end{document}
