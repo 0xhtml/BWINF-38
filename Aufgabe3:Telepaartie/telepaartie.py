@@ -7,10 +7,10 @@ def mögliche_telepaartien(verteilung):
     # Erstelle Varaible für alle Möglichkeiten
     möglichkeiten = set()
 
-    # Gehe durch alle Behälter kombinationen
+    # Gehe durch alle Behälterkombinationen
     for behälter_a in range(len(verteilung)):
         for behälter_b in range(len(verteilung)):
-            # Wenn Behälter A und B nicht der gleiche sind und die umgekehrte
+            # Wenn Behälter A und B nicht der Gleiche sind und die umgekehrte
             # Behälterkombination noch nicht gefunden wurde, füge die
             # Teleportation hinzu
             if behälter_a != behälter_b and (behälter_b, behälter_a) not in möglichkeiten:
@@ -31,7 +31,7 @@ def telepaartiere(verteilung, behälter_a, behälter_b):
     # Ziehe von Behälter A die Biberanzahl von Behälter B ab
     verteilung[behälter_a] -= verteilung[behälter_b]
 
-    # Verdopple die die Biberanzahl in Behälter B
+    # Verdopple die Biberanzahl in Behälter B
     verteilung[behälter_b] *= 2
 
     # Gebe die neue Verteilung zurück
@@ -61,12 +61,12 @@ def run(verteilung, tiefe):
         if 0 in telepaartierte_verteilung:
             return [telepaartie]
 
-        # Es müssen noch mehr Telepartie schritte geschehen, rufe diese Funktion
+        # Es müssen noch mehr Telepartieschritte geschehen, rufe diese Funktion
         # also rekursiv auf
         res = run(telepaartierte_verteilung, tiefe - 1)
 
         # Wenn ein Ergebnis gefunden wurde und dieses besser als das bisher
-        # beste ergebnis ist, speichere das neue beste Ergebnis und setzte die
+        # beste Ergebnis ist, speichere das neue beste Ergebnis und setzte die
         # Tiefe herunter, damit nur noch nach kürzeren Möglichkeiten gesucht
         # wird
         if res != False and (bester == False or len(res) < len(bester)):
@@ -111,7 +111,7 @@ if __name__ == "__main__":
             # Finde die LLL mit einer maximalen Tiefe von n
             telepaartieschritte = run(verteilung, n)
 
-            # Wenn die LLL kleiner ist wurde eine neue beste Möglichkeit
+            # Wenn die LLL kleiner ist, wurde eine neue beste Möglichkeit
             # gefunden, speichere diese also als beste Möglichkeit ab
             if len(telepaartieschritte) > len(bester):
                 bester = telepaartieschritte
@@ -129,7 +129,7 @@ if __name__ == "__main__":
 
         # Gebe die Schritte aus
         for telepaartie in telepaartieschritte:
-            # Speichere die vorhärige Verteilung
+            # Speichere die vorherige Verteilung
             a = str(verteilung)
 
             # Berechne die Verteilung nach der Telepartie
